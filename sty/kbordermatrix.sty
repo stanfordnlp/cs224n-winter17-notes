@@ -1,0 +1,151 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{kbordermatrix}[2011/09/21 Bordered matrix with brackets]
+
+%	Author:	Kim C Border <kcborder@caltech.edu>
+%	Date:		SuperBowl XXXVII (Go Bucs)
+
+%   Revised 2003/09/20
+%		to allow flush right option.
+%   Revised 2011/09/21 
+%		at urging of Bruno Calfa (CMU) 
+%		to coexist with package arydshln
+%		by adding \def\@xarraycr ... 
+
+%	Defines \kbordermatrix along the lines of plain tex's
+%	\bordermatrix (which is still available in LaTeX).
+
+%	In particular, as with \bordermatrix,
+%	1.	It takes the array as an argument.  It does not use \begin{}..\end{}.
+%		Is this a feature or a bug?
+%	2.	The first row is spaced a bit further apart from the rest.
+%	3.	The lower (n-1) by (n-1) block is set off by delimiters.
+%	4.	There is an invisible bottom row of the same height as the segregated
+%		top row that adds to the height of the equation.
+
+%	Differences from \bordermatrix:
+%	1.  Square brackets are used in place of parentheses.
+%	2.  You may use \\ instead of \cr.
+%	3.  The line heights agree with LaTeX's line heights for the
+%		array environment, and \arraystretch is respected.  This means
+%		the bottom (n-1) rows align with the rows of an (n-1)-rowed
+%		\begin{array}..\end{array} (with or without delimiters).
+%	4.	All columns are centered.
+%	** Modified 2003-9-20 to allow flush right option.
+%	5.	The first column is spaced a bit further apart from the rest.
+
+
+%	Differences from \left\[\begin{array}...\end{array}\right\]
+%	1.	It takes the array as an argument.  It does not use \begin{}..\end{}.
+%		Is this a feature or a bug?
+%	2.	Consequently, you cannot use a column specifier (e.g., {l|cr}).
+%	3.	Consequently the maximum number of columns is not specified.
+%	4.	Vertical rules must be put in each row in a separate column.
+%	5.  You can use \hline and \cline.
+
+%	At least it works in the cases I have tried, but I offer no guarantees.
+
+
+
+%	cf. \bordermatrix p. 361, and \vrulealign p. 392 of The TeXbook
+
+
+
+%	Style parameters, they may be redefined according to taste.
+	\newcommand{\kbldelim}{[}	%	Left delimiter
+	\newcommand{\kbrdelim}{]}%	Right delimiter
+			
+	\newcommand{\kbrowstyle}{\scriptstyle}%  Style applied to first row
+	\newcommand{\kbcolstyle}{\scriptstyle}%   Style applied to first column
+	
+	\newlength{\kbcolsep}		%	Extra separation after first border column
+	\newlength{\kbrowsep}		%	Extra separation after first border row
+	
+	\setlength{\kbcolsep}{.5\arraycolsep}
+	\setlength{\kbrowsep}{.2ex}
+	
+	\newif\ifkbalignright
+
+%	Scratch lengths (to be computed)
+	\newlength{\br@kwd}		%	Width of delimiter
+	\newlength{\k@bordht}	%	Height of border column 
+	
+%	This is it
+\newcommand{\kbordermatrix}[1]{%
+\begingroup
+  	%	\br@kwd depends on font size, so compute it now.
+	\setbox0=\hbox{$\left\kbldelim\right.$}
+	\setlength{\br@kwd}{\wd0}
+		%	Compute the array strut based on current value of \arraystretch.
+	\setbox\@arstrutbox\hbox{\vrule 
+		\@height\arraystretch\ht\strutbox 	
+		\@depth\arraystretch\dp\strutbox
+		\@width\z@}
+		%	Compute height of first row and extra space.
+	\setlength{\k@bordht}{\kbrowsep}
+	\addtolength{\k@bordht}{\ht\@arstrutbox}
+	\addtolength{\k@bordht}{\dp\@arstrutbox}
+		%	turn off mathsurround
+	\m@th
+		%	Set the first row style
+	\def\@kbrowstyle{\kbrowstyle}
+		%	Swallow the alignment into box0:
+	\setbox0=\vbox{%
+			%	Define \cr for first row to include the \kbrowsep
+			%	and to reset the row style
+		\def\cr{\crcr\noalign{\kern\kbrowsep
+			\global\let\cr=\endline
+			\global\let\@kbrowstyle=\relax}}
+			%	Redefine \\ a la LaTeX:
+		\let\\\@arraycr
+			%	The following are needed to make a solid \vrule with no gaps
+			%	between the lines.
+		\lineskip\z@skip	
+		\baselineskip\z@skip	
+			%	Compute the length of the skip after the first column
+		\dimen0\kbcolsep \advance\dimen0\br@kwd
+			%	Here begins the alignment:
+		\ialign{\tabskip\dimen0		%	This space will show up after the first column
+			\kern\arraycolsep\hfil\@arstrut$\kbcolstyle ##$\hfil\kern\arraycolsep&
+			\tabskip\z@skip			%	Cancel extra space for other columns
+			\kern\arraycolsep\hfil$\@kbrowstyle ##$\ifkbalignright\relax\else\hfil\fi\kern\arraycolsep&&
+			\kern\arraycolsep\hfil$\@kbrowstyle ##$\ifkbalignright\relax\else\hfil\fi\kern\arraycolsep\crcr
+				%	That ends the template.
+				%	Here is the argument:
+			#1\crcr}%		End \ialign
+	}%	End \setbox0.
+		%	\box0 now holds the array.
+		%
+		%	This next line uses \box2 to hold a throwaway 
+		%	copy of \box0, leaving \box0 intact,
+		%	while putting the last row in \box5.
+	\setbox2=\vbox{\unvcopy0 \global\setbox5=\lastbox}
+		%	We want the width of the first column,
+		%	so we lop off columns until there is only one left.
+		%	It's not elegant or efficient, but at 1 gHz, who cares.
+	\loop
+		\setbox2=\hbox{\unhbox5 \unskip \global\setbox3=\lastbox}
+		\ifhbox3
+			\global\setbox5=\box2
+			\global\setbox1=\box3
+	\repeat
+		%	\box1 now holds the first column of last row.
+		%
+		%	This next line stores the alignment in \box2, 
+		%	while calculating the proper
+		%	delimiter height and placement.
+	\setbox2=\hbox{$\kern\wd1\kern\kbcolsep\kern-\arraycolsep
+		\left\kbldelim
+		\kern-\wd1\kern-\kbcolsep\kern-\br@kwd
+			%
+			%	Here is the output.  The \vcenter aligns the array with the "math axis."
+			%	The negative vertical \kern only shrinks the delimiter's height.
+			%	BTW, I didn't find this in the TeXbook, 
+			%	I had to try various \kerns to see what they did in a 
+			%	\left[\vcenter{}\right].
+	\vcenter{\kern-\k@bordht\vbox{\unvbox0}}
+	\right\kbrdelim$}
+	\null\vbox{\kern\k@bordht\box2}
+		%
+	\endgroup
+}
+
