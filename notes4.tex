@@ -45,8 +45,21 @@
 
 \textbf{Keyphrases: Dependency Parsing. Language Models. RNN. Bi-directional RNN. Deep RNN. GRU. LSTM.}
 %\printclassoptions
-\section{Dependency Parsing}
-\subsection{Dependency Grammar}
+\section{Dependency Grammar and Dependency Structure}
+Parse Trees in NLP, analogous to those in compilers, are used to analyze the syntactic structure of sentences. There are two main types of structures used - Constituency Structures and Dependency Structures. 
+
+Constituency Grammar uses phase structure grammar to organize words into nested constituents. This will be covered in more detail in following chapters. We now focus on Dependency Parsing.
+
+Dependency structure of sentences shows which words depend on (modify or are arguments of) which other words. These binary asymmetric relations between the words are called dependencies and are depicted as arrows going from the \textbf{head} (or governor, superior, regent) to the \textbf{dependent} (or modifier, inferior, subordinate). Usually these dependencies form a tree structure. They are often 	typed with the name of grammatical relations (subject, prepositional object, apposition, etc.). An example of such a dependency tree is shown in Figure~\ref{fig:dep_tree}. Sometimes a fake ROOT node is added as the head to the whole tree so that every word is a dependent of exactly one node.
+
+\begin{marginfigure}
+	\centering
+	\includegraphics[width=\linewidth]{dep_tree.png}
+	\caption {Dependency tree for the sentence "Bills on ports and immigration were submitted by Senator Brownback, Republican of Kansas"}
+	\label{fig:dep_tree}
+\end{marginfigure}
+
+\subsection{Dependency Parsing}
 % TODO: 
 % Include example sentence.
 

@@ -1,4 +1,4 @@
-\documentclass{tufte-handout}
+\documentclass[nobib]{tufte-handout}
 
 \title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
 
@@ -56,6 +56,19 @@ This set of notes begins by introducing the concept of Natural Language Processi
 
 \section{Introduction to Natural Language Processing}\label{sec:intro-nlp}
 
+We begin with a general discussion of what is NLP.
+\subsection{What is so special about NLP?}
+What's so special about human language? Human language is a system specifically constructed to convey meaning, and is not produced by a physical manifestation of any kind. In that way, it is very different from vision or any other machine learning task. Most of the words are just symbols for an extra-linguistic entity : the word is a \emph{signifier} that maps to a \emph{signified} (idea or thing).
+
+\marginnote{Natural language is a discrete/symbolic/categorical system}
+
+For instance, the word "rocket" refers to the concept of a rocket, and by extension can designates an instance of a rocket. A lot of work in linguistics has been done to conceptualize human language and distinguish the words from their reference, their meaning, etc.. (Among others, Wittgenstein, Frege, Russel and Mill). There are some exceptions, when we use words and letters for expressive signaling, like in "Whooompaa". On top of this, the symbols of language can be encoded in several ways : voice, gesture, writing... that are transmitted via \emph{continuous} signals to the brain, which itself appears to encode things in a continuous manner. 
+
+\subsection{Examples of tasks}
+
+
+There are different levels of tasks in NLP, from speech processing to semantic interpretation and discourse processing. The goal of NLP is to be able to design algorithms to allow computers to "understand" natural language in order to perform some task. Example tasks come in varying level of difficulty:
+
 \marginnote{Natural Language Processing tasks come in varying levels of difficulty:
 \begin{itemize}
 \item [\textbf{Easy}]
@@ -72,9 +85,6 @@ This set of notes begins by introducing the concept of Natural Language Processi
 \end{itemize}
 }
 
-We begin with a general discussion of what is NLP. The goal of NLP is to be able to design algorithms to allow computers to "understand" natural language in order to perform some task. Example tasks come in varying level of difficulty:
-
-
 \begin{itemize}
 \item [\textbf{Easy}]
 \item Spell Checking
@@ -89,7 +99,8 @@ We begin with a general discussion of what is NLP. The goal of NLP is to be able
 \item Question Answering (e.g. Answering Jeopardy questions).
 \end{itemize}
 
-What's so special about human language? Human language is a system specifically constructed to convey meaning, and is not produced by a physical manifestation of any kind. In that way, it is very different from vision or any other machine learning task. It is a discrete/symbolic/categorical signaling system. Most of the words are just symbols for an extra-linguistic entity. For instance, the word "rocket" refers to the concept of a rocket, and by extension can designates an instance of a rocket. A lot of work in linguistics has been done to conceptualize human language and distinguish the words from their reference, their meaning, etc.. (Among others, Wittgenstein, Frege, Russel and Mill) - there are some exceptions, where we use words and letters for expressive signaling, like in "Whooompaa". On top of this, the symbols of language can be encoded in several ways : voice, gesture, writing... that are transmitted via \emph{continuous} signals to the brain, which itself appears to encode things in a continuous manner. 
+
+\subsection{How to represent words?}
 
 
 The first and arguably most important common denominator across all NLP tasks is how we represent words as input to any and all of our models. Much of the earlier NLP work that we will not cover treats words as atomic symbols. To perform well on most NLP tasks we first need to have some notion of similarity and difference between words. With word vectors, we can quite easily encode this ability in the vectors themselves (using distance measures such as Jaccard, Cosine, Euclidean, etc).
@@ -119,6 +130,8 @@ For this class of methods to find word embeddings (otherwise known as word vecto
 \subsection{Word-Document Matrix}
 As our first attempt, we make the bold conjecture that words that are related will often appear in the same documents. For instance, "banks", "bonds", "stocks", "money", etc. are probably likely to appear together. But "banks", "octopus", "banana", and "hockey" would probably not consistently appear together. We use this fact to build a word-document matrix, $X$ in the following manner: Loop over billions of documents and for each time word $i$ appears in document $j$, we add one to entry $X_{ij}$. This is obviously a very large matrix ($\mathbb{R}^{|V|\times M}$) and it scales with the number of documents ($M$). So perhaps we can try something better.
 
+
+
 \subsection{Window based Co-occurrence Matrix}
 The same kind of logic applies here however, the matrix $X$ stores co-occurrences of words thereby becoming an affinity matrix. In this method we count the number of times each word appears inside a window of a particular size around the word of interest. We calculate this count for all the words in corpus. We display an example below. Let our corpus contain just three sentences and the window size be 1:
 
@@ -130,6 +143,7 @@ The same kind of logic applies here however, the matrix $X$ stores co-occurrence
 \item $\frac{\sum_{i = 1}^{k}\sigma_i}{\sum_{i = 1}^{|V|}\sigma_i}$ indicates the amount of variance captured by the first $k$ dimensions.
 \end{itemize}
 }
+
 
 \begin{enumerate}
 \item I enjoy flying.
@@ -149,6 +163,8 @@ $$X=\kbordermatrix{
     flying & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 1\\
     . & 0 & 0 & 0 & 0 & 1 & 1 & 1 & 0
   }$$
+
+\subsection{Applying SVD to the cooccurrence matrix}
 
 We now perform SVD on $X$, observe the singular values (the diagonal entries in the resulting $S$ matrix), and cut them off at some index $k$ based on the desired percentage variance captured:
 $$\frac{\sum_{i = 1}^{k}\sigma_i}{\sum_{i = 1}^{|V|}\sigma_i}$$
@@ -204,13 +220,16 @@ $$\kbordermatrix{
 $$
 
 Both of these methods give us word vectors that are more than sufficient to encode semantic and syntactic (part of speech) information but are associated with many other problems:
+
 \begin{itemize}
 \item The dimensions of the matrix change very often (new words are added very frequently and corpus changes in size).
+\marginnote{SVD based methods do not scale well for big matrices and it is hard to incorporate new words or documents. Computational cost for a $ n \times n $ matrix is $ O(mn^2) $}
 \item The matrix is extremely sparse since most words do not co-occur.
 \item The matrix is very high dimensional in general ($\approx 10^6 \times 10^6$)
 \item Quadratic cost to train (i.e. to perform SVD)
 \item Requires the incorporation of some hacks on $X$ to account for the drastic imbalance in word frequency
 \end{itemize}
+\marginnote{However, count-based method make an efficient use of the statistics}
 Some solutions to exist to resolve some of the issues discussed above:
 \begin{itemize}
 \item Ignore function words such as "the", "he", "has", etc.
@@ -222,14 +241,29 @@ As we see in the next section, iteration based methods solve many of these issue
 
 \section{Iteration Based Methods}\label{sec:itermethods}
 
+\marginnote{A note map on Word2vec can be found here : \url{https://myndbook.com/view/4900} $$ $$}
+\marginnote{A detailed summary of word2vec models can also be found here \cite{DBLP:journals/corr/Rong14} $$ $$}
+\marginnote{Iteration-based methods capture cooccurrence of words one at a time instead of capturing all cooccurrence counts directly like in SVD methods.}
+
 Let us step back and try a new approach. Instead of computing and storing global information about some huge dataset (which might be billions of sentences), we can try to create a model that will be able to learn one iteration at a time and eventually be able to encode the probability of a word given its context. 
 
+The idea is to design a model whose parameters are the word vectors. Then, train the model on a certain objective. At every iteration we run our model, evaluate the errors, and follow an update rule that has some notion of penalizing the model parameters that caused the error. Thus, we learn our word vectors. This idea is a very old one dating back to 1986. We call this method "backpropagating" the errors (see \cite{Rumelhart:1988:LRB:65669.104451}). The simpler the model and the task, the faster it will be to train it.
+
 \marginnote{\textbf{Context of a word:}\\
-The context of a word is the set of $C$ surrounding words. For instance, the $C = 2$ context of the word "fox" in the sentence "The quick brown fox jumped over the lazy dog" is \{"quick", "brown", "jumped", "over"\}.}
+The context of a word is the set of $m$ surrounding words. For instance, the $m = 2$ context of the word "fox" in the sentence "The quick brown fox jumped over the lazy dog" is \{"quick", "brown", "jumped", "over"\}.}
 
-We can set up this probabilistic model of known and unknown parameters and take one training example at a time in order to learn just a little bit of information for the unknown parameters based on the input, the output of the model, and the desired output of the model.
+Several approaches have been tested. \cite{DBLP:journals/corr/abs-1103-0398} design models for NLP whose first step is to transform each word in a vector. For each special task (Named Entity Recognition, Part-of-Speech tagging, etc. ) they train not only the model's parameters but also the vectors and achieve great performance, while computing good word vectors! Other interesting reading would be \cite{Bengio:2003:NPL:944919.944966}.
 
-At every iteration we run our model, evaluate the errors, and follow an update rule that has some notion of penalizing the model parameters that caused the error. This idea is a very old one dating back to 1986. We call this method "backpropagating" the errors (see \textsc{Learning representations by back-propagating errors. David E. Rumelhart, Geoffrey E. Hinton, and Ronald J. Williams (1988).})
+
+\marginnote{This model relies on a very important hypothesis in linguistics, \emph{distributional similarity}, the idea that similar words have similar context.}
+
+In this class, we will present a simpler, more recent, probabilistic method by \cite{DBLP:journals/corr/abs-1301-3781} : word2vec. Word2vec is a software package that actually includes :\\
+- \textbf{2 algorithms}: continuous bag-of-words (CBOW) and skip-gram. CBOW aims to predict a center word from the surrounding context in terms of word vectors. Skip-gram does the opposite, and predicts the \emph{distribution} (probability) of context words from a center word.\\
+- \textbf{2 training methods}: negative sampling and hierarchical softmax. Negative sampling defines an objective by sampling \emph{negative} examples, while softmax defines an objective that computes probabilities using all the vocabulary.
+
+
+
+%We can set up this probabilistic model of known and unknown parameters and take one training example at a time in order to learn just a little bit of information for the unknown parameters based on the input, the output of the model, and the desired output of the model.
 
 \subsection{Language Models (Unigrams, Bigrams, etc.)}
 First, we need to create such a model that will assign a probability to a sequence of tokens. Let us start with an example:
@@ -261,7 +295,11 @@ Now that we understand how we can think about a sequence of tokens having a prob
 
 One approach is to treat \{"The", "cat", 'over", "the', "puddle"\} as a context and from these words, be able to predict or generate the center word "jumped". This type of model we call a Continuous Bag of Words (CBOW) Model.
 
-\marginnote{\textbf{CBOW Model:}\\Predicting a center word form the surrounding context}
+\marginnote{\textbf{CBOW Model:}\\Predicting a center word form the surrounding context\\
+\vspace{2mm}
+For each word, we want to learn 2 vectors\\ 
+- $ v $: (input vector) when the word is in the context\\
+- $ u $: (output vector) when the word is in the center\\$$ $$}
 
 Let's discuss the CBOW Model above in greater detail. First, we set up our known parameters. Let the known parameters in our model be the sentence represented by one-hot word vectors. The input one hot vectors or context we will represent with an $x^{(c)}$. And the output as $y^{(c)}$ and in the CBOW model, since we only have one output, so we just call this $y$ which is the one hot vector of the known center word. Now let's define our unknowns in our model. 
 
@@ -270,9 +308,8 @@ Let's discuss the CBOW Model above in greater detail. First, we set up our known
 \item $w_{i}$: Word $i$ from vocabulary $V$
 \item $\mathcal{V} \in \mathbb{R}^{n\times|V|}$: Input word matrix
 \item $v_{i}$: $i$-th column of $\mathcal{V}$, the input vector representation of word $w_{i}$
-\item $\mathcal{U} \in \mathbb{R}^{n\times|V|}$: Output word matrix
+\item $\mathcal{U} \in \mathbb{R}^{|V|\times n}$: Output word matrix
 \item $u_{i}$: $i$-th row of $\mathcal{U}$, the output vector representation of word $w_{i}$
-
 \end{itemize}
 }
 
@@ -280,12 +317,15 @@ We create two matrices, $\mathcal{V} \in \mathbb{R}^{n\times|V|}$ and $\mathcal{
 $$ $$
 We breakdown the way this model works in these steps:
 \begin{enumerate}
-\item We generate our one hot word vectors ($x^{(c-m)}, \hdots, x^{(c-1)}, x^{(c+1)},\hdots, x^{(c+m)}$) for the input context of size $m$.
-\item We get our embedded word vectors for the context ($v_{c-m}=\mathcal{V}x^{(c-m)}$, $v_{c-m+1}=\mathcal{V}x^{(c-m+1)}$, $\hdots$, $v_{c+m}=\mathcal{V}x^{(c+m)}$) 
-\item Average these vectors to get $\hat{v} = \frac{v_{c-m}+v_{c-m+1}+... + v_{c+m}}{2m}$
-\item Generate a score vector $z=\mathcal{U}\hat{v}$
-\item Turn the scores into probabilities $\hat{y}=\operatorname{softmax}(z)$
-\item We desire our probabilities generated, $\hat{y}$, to match the true probabilities, $y$, which also happens to be the one hot vector of the actual word.
+\item We generate our one hot word vectors  for the input context of size $m$ : ($x^{(c-m)}, \hdots, x^{(c-1)}, x^{(c+1)},\hdots, x^{(c+m)} \in \mathbb{R}^{|V|}$).
+\item We get our embedded word vectors for the context ($v_{c-m}=\mathcal{V}x^{(c-m)}$, $v_{c-m+1}=\mathcal{V}x^{(c-m+1)}$, $\hdots$, $v_{c+m}=\mathcal{V}x^{(c+m)} \in \mathbb{R}^n$) 
+\item Average these vectors to get $\hat{v} = \frac{v_{c-m}+v_{c-m+1}+... + v_{c+m}}{2m} \in \mathbb{R}^n$
+\item Generate a score vector $z=\mathcal{U}\hat{v} \in \mathbb{R}^{|V|}$. As the dot product of similar vectors is higher, it will push similar words close to each other in order to achieve a high score.
+\item Turn the scores into probabilities $\hat{y}=\operatorname{softmax}(z) \in \mathbb{R}^{|V|}$. 
+\marginnote{The \textbf{softmax} is an operator that we'll use very frequently. It transforms a vector into a vector whose $ i $-th component is $ \frac{e^{\hat{y}_i}}{\sum_{k=1}^{|V|} e^{\hat{y_k}}} $. \\
+- exponentiate to make positive\\
+- Dividing by $ {\sum_{k=1}^{|V|} e^{\hat{y_k}}} $ \emph{normalizes} the vector ($ \sum_{k=1}^{n} \hat{y}_k = 1 $) to give probability $$ $$} 
+\item We desire our probabilities generated, $\hat{y} \in \mathbb{R}^{|V|}$, to match the true probabilities, $y \in \mathbb{R}^{|V|}$, which also happens to be the one hot vector of the actual word.
 \end{enumerate}
 
 \begin{marginfigure}%
@@ -297,18 +337,27 @@ We breakdown the way this model works in these steps:
 So now that we have an understanding of how our model would work if we had a $\mathcal{V}$ and $\mathcal{U}$, how would we learn these two matrices? Well, we need to create an objective function. Very often when we are trying to learn a probability from some true probability, we look to information theory to give us a measure of the distance between two distributions. Here, we use a popular choice of distance/loss measure, cross entropy $H(\hat{y},y)$. 
 
 The intuition for the use of cross-entropy in the discrete case can be derived from the formulation of the loss function:
+
 $$H(\hat{y},y) = -\sum_{j = 1}^{|V|} y_j \log(\hat{y}_j)$$
+
+\marginnote{$$ $$ $\hat{y} \mapsto H(\hat{y}, y) $ is minimum when $ \hat{y} = y $. Then, if we found a $ \hat{y} $ such that $ H(\hat{y},y)$ is close to the minimum, we have $ \hat{y} \approx y $. This means that our model is very good at predicting the center word!}
 Let us concern ourselves with the case at hand, which is that $y$ is a one-hot vector. Thus we know that the above loss simplifies to simply:
 $$H(\hat{y},y) = -y_i \log(\hat{y}_i)$$
 
 In this formulation, $c$ is the index where the correct word's one hot vector is $1$. We can now consider the case where our prediction was perfect and thus $\hat{y}_c = 1$. We can then calculate $H(\hat{y},y) = -1\log(1) = 0$. Thus, for a perfect prediction, we face no penalty or loss. Now let us consider the opposite case where our prediction was very bad and thus $\hat{y}_c = 0.01$. As before, we can calculate our loss to be $H(\hat{y},y) = -1\log(0.01) \approx 4.605$. We can thus see that for probability distributions, cross entropy provides us with a good measure of distance. We thus formulate our optimization objective as:
+\marginnote{To learn the vectors (the matrices $ U$ and $ V$) CBOW defines a cost that measures how good it is at predicting the center word. Then, we optimize this cost by updating the matrices $ U $ and $ V $ thanks to stochastic gradient descent}
 \begin{align*}
 \operatorname{minimize} J &= -\log P(w_{c}|w_{c-m}, \hdots, w_{c-1}, w_{c+1}, \hdots, w_{c+m})\\
 &= -\log P(u_{c}|\hat{v})\\
 &= -\log \frac{\exp(u_{c}^{T}\hat{v})}{\sum_{j=1}^{|V|}\exp(u_{j}^{T}\hat{v})}\\
 &= -u_{c}^{T}\hat{v}+\log \sum_{j=1}^{|V|}\exp(u_{j}^{T}\hat{v})\\
 \end{align*}
-We use gradient descent to update all relevant word vectors $u_{c}$ and $v_{j}$.\\
+We use stochastic gradient descent to update all relevant word vectors $u_{c}$ and $v_{j}$.\\
+
+\marginnote{Stochastic gradient descent (SGD) computes gradients for a window and updates the parameters \\
+$ \mathcal{U}_{old} \leftarrow \mathcal{U}_{old} - \alpha \nabla_{\mathcal{U}} J $\\
+$ \mathcal{V}_{old} \leftarrow \mathcal{V}_{old} - \alpha \nabla_{\mathcal{V}} J $
+}
 
 %[To be added after Assignment $1$ is graded]
 
@@ -332,24 +381,25 @@ Another approach is to create a model such that given the center word "jumped", 
 Let's discuss the Skip-Gram model above. The setup is largely the same but we essentially swap our $x$ and $y$ i.e. $x$ in the CBOW are now $y$ and vice-versa. The input one hot vector (center word) we will represent with an $x$ (since there is only one). And the output vectors as $y^{(j)}$. We define $\mathcal{V}$ and $\mathcal{U}$ the same as in CBOW.
 \vspace{-.5cm}
 $$ $$
+\begin{marginfigure}%
+  \includegraphics[width=\linewidth]{Skip-Gram}
+  \caption{This image demonstrates how Skip-Gram works and how we must learn the transfer matrices}
+  \label{fig:Skipgram}
+\end{marginfigure}
 We breakdown the way this model works in these 6 steps:
 \begin{enumerate}
-\item We generate our one hot input vector $x$
-\item We get our embedded word vectors for the context $v_{c} =\mathcal{V}x$
-\item Since there is no averaging, just set $\hat{v} = v_{c}$
-?\item Generate $2m$ score vectors, $u_{c-m}, \hdots, u_{c-1}, u_{c+1}, \hdots, u_{c+m}$ using $u=\mathcal{U}v_{c}$
-\item Turn each of the scores into probabilities, $y = \operatorname{softmax}(u)$
+\item We generate our one hot input vector $x \in \mathbb{R}^{|V|} $ of the center word.
+\item We get our embedded word vector for the center word $v_{c} =\mathcal{V}x \in \mathbb{R}^n $
+%\item Generate $2m$ score vectors, $u_{c-m}, \hdots, u_{c-1}, u_{c+1}, \hdots, u_{c+m}$ using $u=\mathcal{U}v_{c}$
+\item Generate a score vector $ z = \mathcal{U} v_{c} $. 
+\item Turn the score vector into probabilities, $\hat{y} = \operatorname{softmax}(z)$. Note that $\hat{y}_{c-m}, \hdots, \hat{y}_{c-1}, \hat{y}_{c+1}, \hdots, \hat{y}_{c+m}$ are the probabilities of observing each context word.
 \item We desire our probability vector generated to match the true probabilities which is
 $y^{(c-m)}, \hdots, y^{(c-1)}, y^{(c+1)}, \hdots, y^{(c+m)}$, the one hot vectors of the actual output.
 \end{enumerate}
 
 As in CBOW, we need to generate an objective function for us to evaluate the model. A key difference here is that we invoke a Naive Bayes assumption to break out the probabilities. If you have not seen this before, then simply put, it is a strong (naive) conditional independence assumption. In other words, given the center word, all output words are completely independent.
 
-\begin{marginfigure}%
-  \includegraphics[width=\linewidth]{Skip-Gram}
-  \caption{This image demonstrates how Skip-Gram works and how we must learn the transfer matrices}
-  \label{fig:Skipgram}
-\end{marginfigure}
+
 
 \begin{align*}
 \operatorname{minimize} J &= -\log P(w_{c-m}, \hdots, w_{c-1}, w_{c+1}, \hdots, w_{c+m}|w_{c})\\
@@ -358,13 +408,25 @@ As in CBOW, we need to generate an objective function for us to evaluate the mod
 &= -\log \prod_{j=0, j\neq m}^{2m} \frac{\exp(u_{c-m+j}^{T}v_{c})}{\sum_{k=1}^{|V|}\exp(u_{k}^{T}v_{c})}\\
 &= -\sum_{j=0, j\neq m}^{2m} u_{c-m+j}^{T}v_{c} + 2m\log \sum_{k=1}^{|V|}\exp(u_{k}^{T}v_{c})\\
 \end{align*}
+
 With this objective function, we can compute the gradients with respect to the unknown
 parameters and at each iteration update them via Stochastic Gradient Descent.
+
+\marginnote{Only one probability vector $ \hat{y} $ is computed. Skip-gram treats each context word equally : the models computes the probability for each word of appearing in the context independently of its distance to the center word}
+
+Note that 
+\begin{align*}
+J &= -\sum_{j=0, j\neq m}^{2m} \log P(u_{c-m+j}|v_{c})\\
+&= \sum_{j=0, j\neq m}^{2m} H(\hat{y}, y_{c-m+j})
+\end{align*}
+
+where $ H(\hat{y}, y_{c-m+j}) $ is the cross-entropy between the probability vector $ \hat{y} $ and the one-hot vector $ y_{c-m+j} $.
 
 %[To be added after Assignment $1$ is graded]
 
 \subsection{Negative Sampling}
 
+\marginnote{Loss function $ J $ for CBOW and Skip-Gram are expensive to compute because of the softmax normalization, where we sum over all $ |V| $ scores! }
 Lets take a second to look at the objective function. Note that the summation over $|V|$ is computationally huge! Any update we do or evaluation of the objective function would take $O(|V|)$ time which if we recall is in the millions. A simple idea is we could instead just approximate it.
 
 For every training step, instead of looping over the entire vocabulary, we can just sample several negative examples! We "sample" from a noise distribution ($P_n(w)$) whose probabilities match the ordering of the frequency of the vocabulary. To augment our formulation of the problem to incorporate Negative Sampling, all we need to do is update the:
@@ -375,7 +437,17 @@ For every training step, instead of looping over the entire vocabulary, we can j
 \end{itemize}
 
 \textsc{Mikolov et al.} present \textbf{Negative Sampling} in \textsc{Distributed Representations of Words and Phrases and their Compositionality}. While negative sampling is based on the Skip-Gram model, it is in fact optimizing a different objective. Consider a pair $(w, c)$ of word and context. Did this pair come from the training data? Let's denote by $P(D = 1|w, c)$ the probability that (w, c) came from the corpus data. Correspondingly, $P(D = 0|w, c)$ will be the probability that $(w, c)$ did not come from the corpus data. First, let's model $P(D = 1|w, c)$ with the sigmoid function:
-$$ P(D = 1|w, c, \theta) = \frac{1}{1+ e^{(-v_c^Tv_w)}}$$
+\marginnote{The \textbf{sigmoid} function\\
+$ \sigma(x) = \frac{1}{1+e^{-x}}$\\
+is the 1D version of the softmax and can be used to model a probability
+}
+\begin{marginfigure}%
+  \includegraphics[width = \linewidth]{sigmoid}
+  \caption{Sigmoid function}
+    \label{fig:sigmoid}
+\end{marginfigure}
+
+$$ P(D = 1|w, c, \theta) = \sigma (v_c^T v_w) = \frac{1}{1+ e^{(-v_c^Tv_w)}}$$
 Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and maximize the probability of a word and context not being in the corpus data if it indeed is not. We take a simple maximum likelihood approach of these two probabilities. (Here we take $\theta$ to be the parameters of the model, and in our case it is $\mathcal{V}$ and $\mathcal{U}$.)
 \begin{align*}
 \theta &= \argmax_{\theta} \prod_{(w,c) \in D} P(D = 1|w, c, \theta) \prod_{(w,c) \in \tilde{D}} P(D = 0|w, c, \theta) \\
@@ -384,8 +456,28 @@ Now, we build a new objective function that tries to maximize the probability of
 &= \argmax_{\theta} \sum_{(w,c) \in D} \log \frac{1}{1 + \exp(-u_w^Tv_c)} + \sum_{(w,c) \in \tilde{D}} \log(1 - \frac{1}{1 + \exp(-u_w^Tv_c)} )\\
 &= \argmax_{\theta} \sum_{(w,c) \in D} \log \frac{1}{1 + \exp(-u_w^Tv_c)} + \sum_{(w,c) \in \tilde{D}} \log(\frac{1}{1 + \exp(u_w^Tv_c)} )\\
 \end{align*}
-Note that $\tilde{D}$ is a "false" or "negative" corpus. Where we would have sentences like "stock boil fish is toy". Unnatural sentences that should get a low probability of ever occurring. We can generate $\tilde{D}$ on the fly by randomly sampling this negative from the word bank. Our new objective function would then be:
-$$ \log \sigma (u_{c-m+j}^{T}\cdot v_{c})+ \sum_{k = 1}^K \log \sigma (- \tilde{u}_{k}^{T}\cdot v_{c}) $$
+Note that maximizing the likelihood is the same as minimizing the negative log likelihood
+
+\begin{align*}
+J = - \sum_{(w,c) \in D} \log \frac{1}{1 + \exp(-u_w^Tv_c)} - \sum_{(w,c) \in \tilde{D}} \log(\frac{1}{1 + \exp(u_w^Tv_c)} )
+\end{align*}
+Note that $\tilde{D}$ is a "false" or "negative" corpus. Where we would have sentences like "stock boil fish is toy". Unnatural sentences that should get a low probability of ever occurring. We can generate $\tilde{D}$ on the fly by randomly sampling this negative from the word bank. 
+
+For skip-gram, our new objective function for observing the context word $ c-m+j$ given the center word $ c $ would be 
+
+
+$$ - \log \sigma (u_{c-m+j}^{T}\cdot v_{c}) -\sum_{k = 1}^K \log \sigma (- \tilde{u}_{k}^{T}\cdot v_{c}) $$
+
+\marginnote{To compare with the regular softmax loss for skip-gram\\$ - u_{c-m+j}^{T}v_{c} + \log \sum_{k=1}^{|V|}\exp(u_{k}^{T}v_{c})$}
+
+$$ $$ 
+
+For CBOW, our new objective function for observing the center word $ u_c $ given the context vector $\hat{v} = \frac{v_{c-m}+v_{c-m+1}+... + v_{c+m}}{2m} $ would be
+
+$$ - \log \sigma (u_{c}^{T}\cdot \hat{v}) -\sum_{k = 1}^K \log \sigma (- \tilde{u}_{k}^{T}\cdot \hat{v}) $$
+\marginnote{To compare with the regular softmax loss for CBOW\\
+$-u_{c}^{T}\hat{v}+\log \sum_{j=1}^{|V|}\exp(u_{j}^{T}\hat{v})\\$}
+
 In the above formulation, $\{\tilde{u}_{k} | k = 1\hdots K\}$ are sampled from $P_n(w)$. Let's discuss what $P_n(w)$ should be. While there is much discussion of what makes the best approximation, what seems to work best is the Unigram Model raised to the power of 3/4. Why 3/4? Here's an example that might help gain some intuition:\\
 \begin{center}
 is: $0.9^{3/4} = 0.92$\\
@@ -395,9 +487,60 @@ bombastic: $0.01^{3/4} = 0.032$\\
 
 "Bombastic" is now 3x more likely to be sampled while "is" only went up marginally.
 
-\subsection{Hierarchical Softmax}
-% TODO
+\subsection{The power of word vectors}
+The word2vec model proves to be very efficient, and the vectors appeared to have very interesting properties. Further papers discusses methods to apply these ideas to produce vectors of sentence.
 
+One famous property of word2vec is the one illustrated by the example 
+
+$$ \overrightarrow{king} - \overrightarrow{man} + \overrightarrow{woman} = \overrightarrow{queen} $$
+
+
+\begin{marginfigure}%
+  \includegraphics[width=\linewidth]{manwoman}
+  \caption{linear relations between word vectors}
+  \label{fig:manwoman}
+\end{marginfigure}
+
+
+\subsection{Hierarchical Softmax}
+
+With negative sampling, we introduced a method that makes the computation much faster. However \cite{DBLP:journals/corr/abs-1301-3781} present an optimization that makes the computation of the softmax much more efficient. 
+
+\marginnote{Hierarchical Softmax uses a binary tree where leaves are the words. A probability is defined as the probability of a random walk from the root to a leaf. Computational cost becomes $ O(\log(|V|)) $}
+Hierarchical softmax uses a binary tree to represent all words in the vocabulary. Each leaf of the tree is a word, and there exists a unique path from the root to the leaf. Each node of the graph (except the root and the leaves) is associated to a vector that the model is going to learn. In this model, there is \emph{no output representation for words}. It can be proved that there are $ |V| - 1 $ inner nodes and thus our model has the same dimensionality. 
+
+
+The probability of the word $ w $ given a vector $ w_i $, $ P(w | w_i) $ in this model is equal to the probability of a random walk starting in the root and ending in the leaf $ w $. The main advantage in computing the probability this way is that the cost is only in $ O(\log(|V|))$. How do we express the probability of this random walk?
+
+\begin{marginfigure}%
+  \includegraphics[width=\linewidth]{tree}
+  \caption{Binary tree for Hierarchical softmax}
+  \label{fig:tree}
+\end{marginfigure}
+
+
+Let's introduce some notation. Let $ L(w) $ be the length of the path from the root to the leaf $ w $. Let's write $ n(w, i) $ the $i$-th node on this path and the associated inner vector $ v_{n(w,i)}  $. $n(w, 1)$ is the root, while $n(w, L(w)$ is the direct ancestor of the leaf $ w $. Now for each inner node $ n $, let's chose one of its child an call it $ ch(n) $ (always the left node for instance). Then, we can compute the probability as 
+
+$$ P(w | w_i) = \prod_{j=1}^{L(w) - 1} \sigma([n(w, j+1) = ch(n(w, j))] \cdot v_{n(w,j)}^T w_i)  $$
+
+where $$[x]  = \begin{cases}
+1 \text{ if $ x $ is true}\\
+-1 \text{ otherwise}
+\end{cases} $$.
+
+Why do we use this $ [n(w, j+1) = ch(n(w, j))]$ term in our formula? It's for normalization. At a node $ n $, if we sum the probabilities for going to the left and right node, you can check that
+
+$$ \sigma(v_n^T w_i) + \sigma(- v_n^T w_i) = 1 $$ 
+
+Then, the probability $ P(w | w_i) $ is just the product of the probability to follow the path. The normalization makes sure that $ \sum_{w=1}^{|V|} P(w| w_i) = 1 $. 
+
+To train the model, we follow the same process as seen before. Our cost to minimize is the negative log likelihood $ - \log P(w| w_i) $!
 
 %[Gradients and update rules to be added after Assignment $1$ is graded]
+
+\nocite{*}
+\footnotesize
+\bibliographystyle{apalike}
+\bibliography{notes1/reference}
+
 \end{document}

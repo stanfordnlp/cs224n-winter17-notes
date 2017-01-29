@@ -50,9 +50,9 @@
 %\printclassoptions
 
 
-\textbf{Keyphrases: Neural networks. Forward computation. Backward propagation. Neuron Units. Max-margin Loss. Gradient checks. Xavier parameter initialization. Learning rates. Adagrad.}
+\textbf{Keyphrases: Neural networks. Forward computation. Backward propagation. Neuron Units. Max-margin Loss. Gradient checks. Xavier parameter initialization. Learning rates. Adagrad.}\\
 
-This set of notes introduces single and multilayer neural networks, and how they can be used for classification purposes. We then discuss how they can be trained using a distributed gradient descent technique known as backpropagation. We will see how the chain rule can be used to make parameter updates sequentially. After a rigorous mathematical discussion of neural networks, we will discuss some practical tips and tricks in training neural networks involving: neuron units (non-linearities), gradient checks, Xavier parameter initialization, learning rates, Adagrad, etc. Lastly, we will motivate using recurrent neural networks as a language model.
+\noindent{}This set of notes introduces single and multilayer neural networks, and how they can be used for classification purposes. We then discuss how they can be trained using a distributed gradient descent technique known as backpropagation. We will see how the chain rule can be used to make parameter updates sequentially. After a rigorous mathematical discussion of neural networks, we will discuss some practical tips and tricks in training neural networks involving: neuron units (non-linearities), gradient checks, Xavier parameter initialization, learning rates, Adagrad, etc. Lastly, we will motivate the use of recurrent neural networks as a language model.
 
 \section{Neural Networks: Foundations}\label{sec:nnets}
 
@@ -98,7 +98,7 @@ Let us define the following abstractions to keep the notation simple and useful 
 b &= \begin{bmatrix}  b_1\\ \vdots \\  b_m \end{bmatrix} \in \mathbb{R}^{m}\\
 W &= \begin{bmatrix} - & w^{(1)T} & -\\ & \cdots & \\ - & w^{(m)T} & - \end{bmatrix} \in \mathbb{R}^{m\times n}
 \end{align*}
-We can now right the output of scaling and biases as:
+We can now write the output of scaling and biases as:
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{SingleLayerNeuralNetwork}
   \caption{This image captures how multiple sigmoid units are stacked on the right, all of which receive the same input $x$.}
@@ -267,15 +267,21 @@ $$ $$
 
 \section{Neural Networks: Tips and Tricks}\label{sec:nnetstips}
 
-Having discussed the mechanics of neural networks, we will now dive into some tips and tricks commonly employed when using neural networks in practice.
+Having discussed the mathematical foundations of neural networks, we will now dive into some tips and tricks commonly employed when using neural networks in practice.
 
 \subsection{Gradient Check}
-We have discussed how to calculate error gradients for parameters in a neural network model using calculus. Here we discuss another technique of approximating the gradient without the use of error backpropagation:
+In the last section, we discussed in detail how to calculate error gradients/updates for parameters in a neural network model via calculus-based (analytic) methods. Here we now introduce a technique of \textit{numerically} approximating these gradients -- though too computationally inefficient to be used directly for training the networks, this method will allow us to very precisely estimate the derivative with respect to any parameter; it can thus serve as a useful sanity check on the correctness of our analytic derivatives. Given a model with parameter vector $\theta$ and loss function $J$, the numerical gradient around $\theta_i$ is simply given by \textbf{centered difference formula}:
 
-$$ f'(\theta) \approx \frac{J(\theta^{(i+)}) - J(\theta^{(i-)})}{2 \epsilon} $$
-where $\theta^{(i+)} = \theta + \epsilon \times e_i$
+$$ f'(\theta) \approx \frac{J(\theta^{(i+)}) - J(\theta^{(i-)})}{2 \epsilon}$$
+where $\epsilon$ is a small number (usually around $1e^{-5}$), and the term $J(\theta^{(i+)})$ is simply the error calculated on a forward pass for a given input when we perturb the parameter $\theta$'s $i^{th}$ element by $+\epsilon$. Similarly, the term $J(\theta^{(i-)})$ is the error calculated on a forward pass for the same input when we perturb the parameter $\theta$'s $i^{th}$ element by $-\epsilon$. Thus, using two forward passes, we can approximate the gradient with respect to any given parameter element in the model. We note that this definition of the numerical gradient follows very naturally from the definition of the derivative, where, in the scalar case,
 
-We know the above holds true from the definition of differentiation, but how does this apply to getting an error gradient? Well, the term $J(\theta^{(i+)})$ is simply the error calculated on a forward pass for a given dataset when we perturb the parameter $\theta$'s $i^{th}$ element by $+\epsilon$. Similarly, the term $J(\theta^{(i-)})$ is the error calculated on a forward pass for the same dataset when we perturb the parameter $\theta$'s $i^{th}$ element by $-\epsilon$. Thus, using two forward passes, we can approximate the gradient with respect to any given parameter in the model. Of course, considering how many operations are required for even a forward pass, this is an extremely expensive procedure of evaluating gradients -- this is a great way of verifying implementations of the backpropagation however.
+$$f'(x) \approx \dfrac{f(x + \epsilon) - f(x)}{\epsilon}$$
+Of course, there is a slight difference -- the definition above only perturbs $x$ in the positive direction to compute the gradient. While it would have been perfectly acceptable to define the numerical gradient in this way, in practice it is often more precise and stable to use the {centered difference formula}, where we perturb a parameter in both directions. The intuition is that to get a better approximation of the derivative/slope around a point, we need to examine the function $f$'s behavior both to the left and right of that point. It can also be shown using Taylor's theorem that the centered difference formula has an error proportional to $\epsilon^2$, which is quite small, whereas the derivative definition is more error-prone.
+
+Now, a natural question you might ask is, if this method is so precise, why do we not use it to compute all of our network gradients instead of applying back-propagation? The simple answer, as hinted earlier, is inefficiency -- recall that every time we want to compute the gradient with respect to an element, we need to make two forward passes through the network, which will be computationally expensive. Furthermore, many large-scale neural networks can contain millions of parameters,and computing two passes per parameter is clearly not optimal. And, since in optimization techniques such as SGD, we must compute the gradients for all parameters several thousands of times (once per iteration), it is obvious that this method quickly grows intractable. This inefficiency is why we only use gradient check to verify the correctness of our analytic gradients, which are much quicker to compute. 
+
+
+% f course, considering how many operations are required for even a forward pass, this is an extremely expensive procedure of evaluating gradients -- as stated eariler, however, is a great way of verifying implementations of the backpropagation however.
 
 \marginnote{\textbf{Gradient checks} are a great way to compare analytical and numerical gradients. Analytical gradients should be close and numerical gradients can be calculated using: $$ f'(\theta) \approx \frac{J(\theta^{(i+)}) - J(\theta^{(i-)})}{2 \epsilon}$$ $J(\theta^{(i+)})$ and $J(\theta^{(i-)})$ can be evaluated using two forward passes. An implementation of this can be seen in Snippet~\ref{snip:gradcheck}.}
 
@@ -304,7 +310,7 @@ def eval_numerical_gradient(f, x):
     ix = it.multi_index
     old_value = x[ix]
     x[ix] = old_value + h # increment by h
-    fxh = f(x) # evaluate f(x + h)
+    fxh_left = f(x) # evaluate f(x + h)
     x[ix] = old_value # restore to previous value (very 
     			      important!)
 
