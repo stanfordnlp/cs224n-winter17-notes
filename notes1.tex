@@ -2,7 +2,7 @@
 
 \title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
 
-\author[Francois Chaubard, Rohit Mundra, Richard Socher]{Lecture Notes: Part I\thanks{Authors: Francois Chaubard, Rohit Mundra, Richard Socher}}
+\author[Francois Chaubard, Rohit Mundra, Richard Socher]{Lecture Notes: Part I\thanks{Authors: Francois Chaubard, Michael Fang, Guillaume Genthial, Rohit Mundra, Richard Socher}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -58,32 +58,15 @@ This set of notes begins by introducing the concept of Natural Language Processi
 
 We begin with a general discussion of what is NLP.
 \subsection{What is so special about NLP?}
-What's so special about human language? Human language is a system specifically constructed to convey meaning, and is not produced by a physical manifestation of any kind. In that way, it is very different from vision or any other machine learning task. Most of the words are just symbols for an extra-linguistic entity : the word is a \emph{signifier} that maps to a \emph{signified} (idea or thing).
+What's so special about human (natural) language? Human language is a system specifically constructed to convey meaning, and is not produced by a physical manifestation of any kind. In that way, it is very different from vision or any other machine learning task. \\ \marginnote{Natural language is a discrete/symbolic/categorical system}
+	Most words are just symbols for an extra-linguistic entity : the word is a \emph{signifier} that maps to a \emph{signified} (idea or thing).
 
-\marginnote{Natural language is a discrete/symbolic/categorical system}
-
-For instance, the word "rocket" refers to the concept of a rocket, and by extension can designates an instance of a rocket. A lot of work in linguistics has been done to conceptualize human language and distinguish the words from their reference, their meaning, etc.. (Among others, Wittgenstein, Frege, Russel and Mill). There are some exceptions, when we use words and letters for expressive signaling, like in "Whooompaa". On top of this, the symbols of language can be encoded in several ways : voice, gesture, writing... that are transmitted via \emph{continuous} signals to the brain, which itself appears to encode things in a continuous manner. 
+For instance, the word "rocket" refers to the concept of a rocket, and by extension can designate an instance of a rocket. There are some exceptions, when we use words and letters for expressive signaling, like in "Whooompaa". On top of this, the symbols of language can be encoded in several modalities : voice, gesture, writing, etc that are transmitted via \emph{continuous} signals to the brain, which itself appears to encode things in a continuous manner. (A lot of work in philosophy of language and linguistics has been done to conceptualize human language and distinguish words from their references, meanings, etc. Among others, see works by Wittgenstein, Frege, Russell and Mill.)
 
 \subsection{Examples of tasks}
 
 
 There are different levels of tasks in NLP, from speech processing to semantic interpretation and discourse processing. The goal of NLP is to be able to design algorithms to allow computers to "understand" natural language in order to perform some task. Example tasks come in varying level of difficulty:
-
-\marginnote{Natural Language Processing tasks come in varying levels of difficulty:
-\begin{itemize}
-\item [\textbf{Easy}]
-\item Spell Checking
-\item Keyword Search
-\item Finding Synonyms
-\item [\textbf{Medium}]
-\item Parsing information from websites, documents, etc.
-\item [\textbf{Hard}]
-\item Machine Translation
-\item Semantic Analysis
-\item Coreference
-\item Question Answering
-\end{itemize}
-}
 
 \begin{itemize}
 \item [\textbf{Easy}]
@@ -103,7 +86,7 @@ There are different levels of tasks in NLP, from speech processing to semantic i
 \subsection{How to represent words?}
 
 
-The first and arguably most important common denominator across all NLP tasks is how we represent words as input to any and all of our models. Much of the earlier NLP work that we will not cover treats words as atomic symbols. To perform well on most NLP tasks we first need to have some notion of similarity and difference between words. With word vectors, we can quite easily encode this ability in the vectors themselves (using distance measures such as Jaccard, Cosine, Euclidean, etc).
+The first and arguably most important common denominator across all NLP tasks is how we represent words as input to any of our models. Much of the earlier NLP work that we will not cover treats words as atomic symbols. To perform well on most NLP tasks we first need to have some notion of similarity and difference between words. With word vectors, we can quite easily encode this ability in the vectors themselves (using distance measures such as Jaccard, Cosine, Euclidean, etc).
 
 \section{Word Vectors}\label{sec:wordvectors}
 
@@ -223,7 +206,7 @@ Both of these methods give us word vectors that are more than sufficient to enco
 
 \begin{itemize}
 \item The dimensions of the matrix change very often (new words are added very frequently and corpus changes in size).
-\marginnote{SVD based methods do not scale well for big matrices and it is hard to incorporate new words or documents. Computational cost for a $ n \times n $ matrix is $ O(mn^2) $}
+\marginnote{SVD based methods do not scale well for big matrices and it is hard to incorporate new words or documents. Computational cost for a $ m \times n $ matrix is $ O(mn^2) $}
 \item The matrix is extremely sparse since most words do not co-occur.
 \item The matrix is very high dimensional in general ($\approx 10^6 \times 10^6$)
 \item Quadratic cost to train (i.e. to perform SVD)
@@ -239,10 +222,11 @@ Some solutions to exist to resolve some of the issues discussed above:
 
 As we see in the next section, iteration based methods solve many of these issues in a far more elegant manner.
 
-\section{Iteration Based Methods}\label{sec:itermethods}
+\section{Iteration Based Methods - Word2vec}\label{sec:itermethods}
 
-\marginnote{A note map on Word2vec can be found here : \url{https://myndbook.com/view/4900} $$ $$}
+\marginnote{\textbf{For an overview of Word2vec}, a note map can be found here : \url{https://myndbook.com/view/4900} $$ $$}
 \marginnote{A detailed summary of word2vec models can also be found here \cite{DBLP:journals/corr/Rong14} $$ $$}
+
 \marginnote{Iteration-based methods capture cooccurrence of words one at a time instead of capturing all cooccurrence counts directly like in SVD methods.}
 
 Let us step back and try a new approach. Instead of computing and storing global information about some huge dataset (which might be billions of sentences), we can try to create a model that will be able to learn one iteration at a time and eventually be able to encode the probability of a word given its context. 
@@ -259,7 +243,7 @@ Several approaches have been tested. \cite{DBLP:journals/corr/abs-1103-0398} des
 
 In this class, we will present a simpler, more recent, probabilistic method by \cite{DBLP:journals/corr/abs-1301-3781} : word2vec. Word2vec is a software package that actually includes :\\
 - \textbf{2 algorithms}: continuous bag-of-words (CBOW) and skip-gram. CBOW aims to predict a center word from the surrounding context in terms of word vectors. Skip-gram does the opposite, and predicts the \emph{distribution} (probability) of context words from a center word.\\
-- \textbf{2 training methods}: negative sampling and hierarchical softmax. Negative sampling defines an objective by sampling \emph{negative} examples, while softmax defines an objective that computes probabilities using all the vocabulary.
+- \textbf{2 training methods}: negative sampling and hierarchical softmax. Negative sampling defines an objective by sampling \emph{negative} examples, while hierarchical softmax defines an objective using an efficient tree structure to compute probabilities for all the vocabulary.
 
 
 
@@ -295,7 +279,7 @@ Now that we understand how we can think about a sequence of tokens having a prob
 
 One approach is to treat \{"The", "cat", 'over", "the', "puddle"\} as a context and from these words, be able to predict or generate the center word "jumped". This type of model we call a Continuous Bag of Words (CBOW) Model.
 
-\marginnote{\textbf{CBOW Model:}\\Predicting a center word form the surrounding context\\
+\marginnote{\textbf{CBOW Model:}\\Predicting a center word from the surrounding context\\
 \vspace{2mm}
 For each word, we want to learn 2 vectors\\ 
 - $ v $: (input vector) when the word is in the context\\
@@ -355,7 +339,7 @@ In this formulation, $c$ is the index where the correct word's one hot vector is
 We use stochastic gradient descent to update all relevant word vectors $u_{c}$ and $v_{j}$.\\
 
 \marginnote{Stochastic gradient descent (SGD) computes gradients for a window and updates the parameters \\
-$ \mathcal{U}_{old} \leftarrow \mathcal{U}_{old} - \alpha \nabla_{\mathcal{U}} J $\\
+$ \mathcal{U}_{new} \leftarrow \mathcal{U}_{old} - \alpha \nabla_{\mathcal{U}} J $\\
 $ \mathcal{V}_{old} \leftarrow \mathcal{V}_{old} - \alpha \nabla_{\mathcal{V}} J $
 }
 
@@ -426,7 +410,7 @@ where $ H(\hat{y}, y_{c-m+j}) $ is the cross-entropy between the probability vec
 
 \subsection{Negative Sampling}
 
-\marginnote{Loss function $ J $ for CBOW and Skip-Gram are expensive to compute because of the softmax normalization, where we sum over all $ |V| $ scores! }
+\marginnote{Loss functions $ J $ for CBOW and Skip-Gram are expensive to compute because of the softmax normalization, where we sum over all $ |V| $ scores! }
 Lets take a second to look at the objective function. Note that the summation over $|V|$ is computationally huge! Any update we do or evaluation of the objective function would take $O(|V|)$ time which if we recall is in the millions. A simple idea is we could instead just approximate it.
 
 For every training step, instead of looping over the entire vocabulary, we can just sample several negative examples! We "sample" from a noise distribution ($P_n(w)$) whose probabilities match the ordering of the frequency of the vocabulary. To augment our formulation of the problem to incorporate Negative Sampling, all we need to do is update the:
@@ -487,30 +471,15 @@ bombastic: $0.01^{3/4} = 0.032$\\
 
 "Bombastic" is now 3x more likely to be sampled while "is" only went up marginally.
 
-\subsection{The power of word vectors}
-The word2vec model proves to be very efficient, and the vectors appeared to have very interesting properties. Further papers discusses methods to apply these ideas to produce vectors of sentence.
-
-One famous property of word2vec is the one illustrated by the example 
-
-$$ \overrightarrow{king} - \overrightarrow{man} + \overrightarrow{woman} = \overrightarrow{queen} $$
-
-
-\begin{marginfigure}%
-  \includegraphics[width=\linewidth]{manwoman}
-  \caption{linear relations between word vectors}
-  \label{fig:manwoman}
-\end{marginfigure}
-
 
 \subsection{Hierarchical Softmax}
 
-With negative sampling, we introduced a method that makes the computation much faster. However \cite{DBLP:journals/corr/abs-1301-3781} present an optimization that makes the computation of the softmax much more efficient. 
+\textsc{Mikolov et al.} also present hierarchical softmax as a much more efficient alternative to the normal softmax. In practice, hierarchical softmax tends to be better for infrequent words, while negative sampling works better for frequent words and lower dimensional vectors. 
 
-\marginnote{Hierarchical Softmax uses a binary tree where leaves are the words. A probability is defined as the probability of a random walk from the root to a leaf. Computational cost becomes $ O(\log(|V|)) $}
-Hierarchical softmax uses a binary tree to represent all words in the vocabulary. Each leaf of the tree is a word, and there exists a unique path from the root to the leaf. Each node of the graph (except the root and the leaves) is associated to a vector that the model is going to learn. In this model, there is \emph{no output representation for words}. It can be proved that there are $ |V| - 1 $ inner nodes and thus our model has the same dimensionality. 
+\marginnote{Hierarchical Softmax uses a binary tree where leaves are the words. The probability of a word being the output word is defined as the probability of a random walk from the root to that word's leaf. Computational cost becomes $ O(\log(|V|)) $ instead of O(|V|).}
+Hierarchical softmax uses a binary tree to represent all words in the vocabulary. Each leaf of the tree is a word, and there is a unique path from root to leaf. In this model, there is \emph{no output representation for words}. Instead, each node of the graph (except the root and the leaves) is associated to a vector that the model is going to learn.
 
-
-The probability of the word $ w $ given a vector $ w_i $, $ P(w | w_i) $ in this model is equal to the probability of a random walk starting in the root and ending in the leaf $ w $. The main advantage in computing the probability this way is that the cost is only in $ O(\log(|V|))$. How do we express the probability of this random walk?
+In this model, the probability of a word $ w $ given a vector $ w_i $, $ P(w | w_i) $, is equal to the probability of a random walk starting in the root and ending in the leaf node corresponding to $ w $. The main advantage in computing the probability this way is that the cost is only $ O(\log(|V|))$, corresponding to the length of the path. 
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{tree}
@@ -519,24 +488,54 @@ The probability of the word $ w $ given a vector $ w_i $, $ P(w | w_i) $ in this
 \end{marginfigure}
 
 
-Let's introduce some notation. Let $ L(w) $ be the length of the path from the root to the leaf $ w $. Let's write $ n(w, i) $ the $i$-th node on this path and the associated inner vector $ v_{n(w,i)}  $. $n(w, 1)$ is the root, while $n(w, L(w)$ is the direct ancestor of the leaf $ w $. Now for each inner node $ n $, let's chose one of its child an call it $ ch(n) $ (always the left node for instance). Then, we can compute the probability as 
+Let's introduce some notation. Let $ L(w) $ be the number of nodes in the path from the root to the leaf $ w $. For instance, $L(w_2)$ in Figure \ref{fig:tree} is 3.  Let's write $ n(w, i) $ as the $i$-th node on this path with associated vector $ v_{n(w,i)}  $. So $n(w, 1)$ is the root, while $n(w, L(w))$ is the father of $ w $. Now for each inner node $ n $, we arbitrarily choose one of its children and call it $ ch(n) $ (e.g. always the left node). Then, we can compute the probability as 
 
-$$ P(w | w_i) = \prod_{j=1}^{L(w) - 1} \sigma([n(w, j+1) = ch(n(w, j))] \cdot v_{n(w,j)}^T w_i)  $$
+$$ P(w | w_i) = \prod_{j=1}^{L(w) - 1} \sigma([n(w, j+1) = ch(n(w, j))] \cdot v_{n(w,j)}^T v_{w_i})  $$
 
 where $$[x]  = \begin{cases}
 1 \text{ if $ x $ is true}\\
 -1 \text{ otherwise}
 \end{cases} $$.
 
-Why do we use this $ [n(w, j+1) = ch(n(w, j))]$ term in our formula? It's for normalization. At a node $ n $, if we sum the probabilities for going to the left and right node, you can check that
+and $\sigma(\cdot)$ is the sigmoid function. \\
+This formula is fairly dense, so let's examine it more closely. 
+\\ First, we are computing a product of terms based on the shape of the path from the root ($n(w,1)$) to the leaf ($w$). If we assume $ch(n)$ is always the left node of $n$, then term $ [n(w, j+1) = ch(n(w, j))]$ returns 1 when the path goes left, and -1 if right.  \\
+Furthermore, the term $ [n(w, j+1) = ch(n(w, j))]$ provides normalization. At a node $ n $, if we sum the probabilities for going to the left and right node, you can check that for any value of $v_n^T v_{w_i}$, 
 
-$$ \sigma(v_n^T w_i) + \sigma(- v_n^T w_i) = 1 $$ 
+$$ \sigma(v_n^T v_{w_i}) + \sigma(- v_n^T v_{w_i}) = 1 $$ 
 
-Then, the probability $ P(w | w_i) $ is just the product of the probability to follow the path. The normalization makes sure that $ \sum_{w=1}^{|V|} P(w| w_i) = 1 $. 
+The normalization also ensures that $ \sum_{w=1}^{|V|} P(w| w_i) = 1 $, just as in the original softmax. \\
+Finally, we compare the similarity of our input vector $v_{w_i}$ to each inner node vector $v^T_{n(w,j)}$ using a dot product. 
+Let's run through an example. Taking $w_2$ in Figure \ref{fig:tree}, we must take two left edges and then a right edge to reach $w_2$ from the root, so 
+\begin{align*}
+ P(w_2 | w_i) &= p(n(w_2,1), \text{left}) \cdot p(n(w_2,2), \text{left}) \cdot p(n(w_2, 3), \text{right}) \\
+&= \sigma(v^T_{n(w_2,1)} v_{w_i}) \cdot  \sigma(v^T_{n(w_2,2)} v_{w_i}) \cdot
+\sigma(-v^T_{n(w_2,3)} v_{w_i})
+\end{align*}
 
-To train the model, we follow the same process as seen before. Our cost to minimize is the negative log likelihood $ - \log P(w| w_i) $!
+
+To train the model, our goal is still to minimize the negative log likelihood $ - \log P(w| w_i) $. But instead of updating output vectors per word, we update the vectors of the nodes in the binary tree that are in the path from root to leaf node.  
+
+The speed of this method is determined by the way in which the binary tree is constructed and words are assigned to leaf nodes. \textsc{Mikolov et al.}  use a binary Huffman tree, which assigns frequent words shorter paths in the tree. 
 
 %[Gradients and update rules to be added after Assignment $1$ is graded]
+
+% seems a little incomplete
+
+% \subsection{The power of word vectors}
+% The word2vec model proves to be very efficient, and the vectors appeared to have very interesting properties. Further papers discuss methods to apply these ideas to produce vectors for text sequences.
+
+% One famous property of word2vec is the one illustrated by the example 
+
+% $$ \overrightarrow{king} - \overrightarrow{man} + \overrightarrow{woman} = \overrightarrow{queen} $$
+
+
+% \begin{marginfigure}%
+%   \includegraphics[width=\linewidth]{manwoman}
+%   \caption{linear relations between word vectors}
+%   \label{fig:manwoman}
+% \end{marginfigure}
+
 
 \nocite{*}
 \footnotesize

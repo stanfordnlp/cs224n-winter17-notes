@@ -1,0 +1,38 @@
+\usepackage{listings, textcomp, color, verbatim}
+\definecolor{deepgreen}{rgb}{0,0.4,0}
+
+\lstdefinestyle{python}{
+		language=python,
+		basicstyle=\color{black}\ttfamily\footnotesize,
+		stringstyle=\color{deepgreen}\slshape,
+		commentstyle=\color{gray}\slshape,
+		keywordstyle=\color{red}\bf,
+		emphstyle=\color{blue}\bf,
+		tabsize=2,
+		%%%%%%%%%%%%%%%
+		showstringspaces=false,
+    emph={access,and,break,class,continue,def,del,elif,else,except,exec,finally,for,from,global,if,import,in,i s,lambda,not,or,pass,print,raise,return,try,while,as},
+		upquote=true,
+		morecomment=[s]{"""}{"""},
+		literate=*
+		{:}{{\textcolor{blue}:}}{1}%
+		{=}{{\textcolor{blue}=}}{1}%
+		{-}{{\textcolor{blue}-}}{1}%
+		{+}{{\textcolor{blue}+}}{1}%
+		{*}{{\textcolor{blue}*}}{1}%
+		{!}{{\textcolor{blue}!}}{1}%
+		{(}{{\textcolor{blue}(}}{1}%
+		{)}{{\textcolor{blue})}}{1}%
+		{[}{{\textcolor{blue}[}}{1}%
+		{]}{{\textcolor{blue}]}}{1}%
+		{<}{{\textcolor{blue}<}}{1}%
+		{>}{{\textcolor{blue}>}}{1},%
+		%%%%%%%%%%%%%%%%
+		aboveskip=\baselineskip,
+		xleftmargin=20pt, xrightmargin=15pt,
+		frame=single,
+		numbers=none, numberstyle=\tiny
+}
+\lstnewenvironment{python}{\lstset{style=python}}{}
+\newcommand{\inputsamplepython}[1]{\lstinputlisting[style=python]{../ClassCodes/#1}}
+\newcommand{\inputpython}[1]{\lstinputlisting[style=python]{#1}}

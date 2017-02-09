@@ -1,0 +1,135 @@
+% \ifx \allfiles \undefined
+
+% \documentclass{article}
+
+% \usepackage{tikz}
+% \usetikzlibrary{shapes,calc,positioning,arrows,mindmap,matrix}
+% \usetikzlibrary{decorations.pathreplacing}
+
+% \begin{document}
+% \fi
+
+\def\layersep{1.2cm}
+\def\numHidden{6}
+\def\numOutput{4}
+\def\dx{3.3}
+\def\dy{2.2}
+\tikzset{
+      treenode/.style = {align=center, inner sep=4pt, text centered,font=\sffamily},
+    node/.style = {treenode, minimum width=1.3em, text height=1em},
+	line/.style = {very thick, dashed, rounded corners, fill=orange!15!white, fill opacity=0.2}
+}
+
+% \tikzset{
+
+%   line/.style = {very thick, dashed, fill=orange!30!white, fill opacity=0.2}
+% }
+
+\begin{tikzpicture}[scale=0.8,shorten >=1pt,->,draw=black!50, node distance=\layersep]
+
+    \tikzstyle{neuron}=[circle,fill=black!25,minimum size=13pt,inner sep=0pt]
+    \tikzstyle{annot} = [text width=15em, text centered]
+
+    \foreach \name / \y in {1,...,3}
+        \node[neuron,fill=red!50] (I-\name) at (\y/2, 0) {};
+
+    \node[annot] (cdot-1) at (3/2+0.8,0) {$\cdots$};
+
+    \foreach \name / \y in {4,...,6}
+        \node[neuron,fill=red!50] (I-\name) at (\y/2+1, 0) {};
+
+    \foreach \name / \y in {7,...,9}
+        \node[neuron,fill=blue!50,postaction={pattern=north east lines}] (I-\name) at (\y/2+1.5, 0) {};
+
+    \node[annot] (cdot-2) at (9/2+2.3,0) {$\cdots$};
+
+    \foreach \name / \y in {10,...,12}
+        \node[neuron,fill=blue!50,postaction={pattern=north east lines}] (I-\name) at (\y/2+2.5, 0) {};
+
+    \foreach \name / \y in {13,...,15}
+        \node[neuron,fill=orange!50,postaction={pattern=north west lines}] (I-\name) at (\y/2+3, 0) {};
+
+    \foreach \name / \y in {1,...,3}
+        \node[neuron,fill=gray!50] (H-\name) at (\y*0.8+2.4,\layersep) {};
+
+    \node[annot] (cdot-3) at (5.5,\layersep) {$\cdots$};
+
+    \foreach \name / \y in {4,...,6}
+        \node[neuron,fill=gray!50] (H-\name) at (\y*0.8+3.1,\layersep) {};
+
+
+    \foreach \name / \y in {1,...,2}
+        \node[neuron,fill=black!50] (S-\name) at (\y*0.8+3.1,\layersep*2) {};
+
+    \node[annot] (cdot-4) at (5.5,\layersep*2) {$\cdots$};
+
+    \foreach \name / \y in {3,...,4}
+        \node[neuron,fill=black!50] (S-\name) at (\y*0.8+3.8,\layersep*2) {};
+
+
+     \foreach \source in {2,5,8,11,14}
+	    \foreach \dest in {2, 5}
+            \path (I-\source) edge (H-\dest);
+
+    \foreach \source in {2, 5}
+        \foreach \dest in {1,...,\numOutput}
+            \path (H-\source) edge (S-\dest);
+
+    
+    \node[annot] at (-3,0) {\textbf{Input layer}: $[x^w, x^t, x^l]$};
+    \node[annot] at (-3,\layersep){\textbf{Hidden layer}: \\ $h = (W^w_1 x^w + W^t_1 x^t + W^l_1 x^l + b_1)^3$};
+    \node[annot] at (-3,\layersep*2){\textbf{Softmax layer}: \\ $p = \texttt{softmax}(W_2 h)$};
+
+    \draw [line] ($(I-1.south west)+(-0.2, -0.2)$) rectangle ($(I-3.north east)+( 0.2, 0.2)$);
+    \draw [line] ($(I-4.south west)+(-0.2, -0.2)$) rectangle ($(I-6.north east)+( 0.2, 0.2)$);
+    \draw [line] ($(I-7.south west)+(-0.2, -0.2)$) rectangle ($(I-9.north east)+( 0.2, 0.2)$);
+    \draw [line] ($(I-10.south west)+(-0.2, -0.2)$) rectangle ($(I-12.north east)+( 0.2, 0.2)$);
+    \draw [line] ($(I-13.south west)+(-0.2, -0.2)$) rectangle ($(I-15.north east)+( 0.2, 0.2)$);
+
+   	\draw [line,solid] ($(I-1.south west)+(-0.3, -0.3)$) rectangle ($(I-15.north east)+( 0.3, 0.3)$);
+
+   	\draw [line,solid] ($(H-1.south west)+(-0.2, -0.2)$) rectangle ($(H-\numHidden.north east)+( 0.2, 0.2)$);
+    \draw [line,solid] ($(S-1.south west)+(-0.3, -0.3)$) rectangle ($(S-\numOutput.north east)+( 0.3, 0.3)$);
+
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=3pt}] ($(I-1.south west)+(-0.3, -0.3)$) -- ($(I-6.south east)+(0.3, -0.3)$) node [black,midway,yshift=-0.6cm] {words};
+
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=3pt}] ($(I-7.south west)+(-0.3, -0.3)$) -- ($(I-12.south east)+(0.3, -0.3)$) node [black,midway,yshift=-0.6cm] {POS tags};
+
+    \draw [decorate,decoration={brace,amplitude=5pt,mirror,raise=3pt}] ($(I-13.south west)+(-0.3, -0.3)$) -- ($(I-15.south east)+(0.3, -0.3)$) node [black,midway,yshift=-0.6cm] {arc labels};
+
+
+\node [node] at (-2+\dx,-5+\dy) (1) {ROOT};
+
+\node [node] at (0+\dx,-5+\dy) (2) {has\_VBZ}
+child[level distance=1.25cm]
+{ 
+node [node,xshift=-1cm,font=\sffamily] (4) {He\_PRP}
+edge from parentnode[left, xshift=1.3cm, yshift=-0.2cm] {nsubj}
+};
+
+\node [node] at (0+\dx,-5+\dy) (2) {has\_VBZ};
+\node [node] at (2+\dx,-5+\dy) (3) {good\_JJ};
+\node [node] at (5+\dx,-5+\dy) (4) {control\_NN};
+\node [node] at (7+\dx,-5+\dy) (5) {.\_.};
+
+\node [node] at (0+\dx,-4+\dy) {Stack};
+\node [node] at (6+\dx,-4+\dy) {Buffer};
+
+% \path (3) edge (I-5);
+% \path (3) edge (I-8);
+
+% \draw [dashed, thick, ->] (2+\dx,-4.8+\dy) -- (3.5,-0.2);
+% \draw [dashed, thick, ->] (2.5+\dx,-4.8+\dy) -- (5.5,-0.2);
+% \draw [dashed, thick, ->] (0.5+\dx,-5.8+\dy) -- (10,-0.2);
+
+\node[annot] at (-3,-5+\dy){\textbf{Configuration}};
+
+\draw [very thick, fill=orange!30!white, fill opacity=0.2] ($(1.south west)+(-0.1, -0.1)$) rectangle ($(3.north east)+( 0.1, 0.1)$);
+\draw [very thick, fill=orange!30!white, fill opacity=0.2] ($(4.south west)+(-0.1, -0.1)$) rectangle ($(5.north east)+( 0.1, 0.1)$);
+
+\end{tikzpicture}
+% End of code
+
+% \ifx \allfiles \undefined
+% \end{document}
+% \fi

@@ -2,7 +2,7 @@
 
 \title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
 
-\author[Rohit Mundra, Richard Socher]{Lecture Notes: Part III\thanks{Author: Rohit Mundra, Richard Socher}}
+\author[Rohit Mundra, Richard Socher]{Lecture Notes: Part III\thanks{Author: Rohit Mundra, Amani Peddada, Richard Socher,  Qiaojing Yan}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -273,19 +273,18 @@ Having discussed the mathematical foundations of neural networks, we will now di
 In the last section, we discussed in detail how to calculate error gradients/updates for parameters in a neural network model via calculus-based (analytic) methods. Here we now introduce a technique of \textit{numerically} approximating these gradients -- though too computationally inefficient to be used directly for training the networks, this method will allow us to very precisely estimate the derivative with respect to any parameter; it can thus serve as a useful sanity check on the correctness of our analytic derivatives. Given a model with parameter vector $\theta$ and loss function $J$, the numerical gradient around $\theta_i$ is simply given by \textbf{centered difference formula}:
 
 $$ f'(\theta) \approx \frac{J(\theta^{(i+)}) - J(\theta^{(i-)})}{2 \epsilon}$$
-where $\epsilon$ is a small number (usually around $1e^{-5}$), and the term $J(\theta^{(i+)})$ is simply the error calculated on a forward pass for a given input when we perturb the parameter $\theta$'s $i^{th}$ element by $+\epsilon$. Similarly, the term $J(\theta^{(i-)})$ is the error calculated on a forward pass for the same input when we perturb the parameter $\theta$'s $i^{th}$ element by $-\epsilon$. Thus, using two forward passes, we can approximate the gradient with respect to any given parameter element in the model. We note that this definition of the numerical gradient follows very naturally from the definition of the derivative, where, in the scalar case,
+where $\epsilon$ is a small number (usually around $1e^{-5}$). The term $J(\theta^{(i+)})$ is simply the error calculated on a forward pass for a given input when we perturb the parameter $\theta$'s $i^{th}$ element by $+\epsilon$. Similarly, the term $J(\theta^{(i-)})$ is the error calculated on a forward pass for the same input when we perturb the parameter $\theta$'s $i^{th}$ element by $-\epsilon$. Thus, using two forward passes, we can approximate the gradient with respect to any given parameter element in the model. We note that this definition of the numerical gradient follows very naturally from the definition of the derivative, where, in the scalar case,
 
 $$f'(x) \approx \dfrac{f(x + \epsilon) - f(x)}{\epsilon}$$
-Of course, there is a slight difference -- the definition above only perturbs $x$ in the positive direction to compute the gradient. While it would have been perfectly acceptable to define the numerical gradient in this way, in practice it is often more precise and stable to use the {centered difference formula}, where we perturb a parameter in both directions. The intuition is that to get a better approximation of the derivative/slope around a point, we need to examine the function $f$'s behavior both to the left and right of that point. It can also be shown using Taylor's theorem that the centered difference formula has an error proportional to $\epsilon^2$, which is quite small, whereas the derivative definition is more error-prone.
-
-Now, a natural question you might ask is, if this method is so precise, why do we not use it to compute all of our network gradients instead of applying back-propagation? The simple answer, as hinted earlier, is inefficiency -- recall that every time we want to compute the gradient with respect to an element, we need to make two forward passes through the network, which will be computationally expensive. Furthermore, many large-scale neural networks can contain millions of parameters,and computing two passes per parameter is clearly not optimal. And, since in optimization techniques such as SGD, we must compute the gradients for all parameters several thousands of times (once per iteration), it is obvious that this method quickly grows intractable. This inefficiency is why we only use gradient check to verify the correctness of our analytic gradients, which are much quicker to compute. 
-
-
-% f course, considering how many operations are required for even a forward pass, this is an extremely expensive procedure of evaluating gradients -- as stated eariler, however, is a great way of verifying implementations of the backpropagation however.
 
 \marginnote{\textbf{Gradient checks} are a great way to compare analytical and numerical gradients. Analytical gradients should be close and numerical gradients can be calculated using: $$ f'(\theta) \approx \frac{J(\theta^{(i+)}) - J(\theta^{(i-)})}{2 \epsilon}$$ $J(\theta^{(i+)})$ and $J(\theta^{(i-)})$ can be evaluated using two forward passes. An implementation of this can be seen in Snippet~\ref{snip:gradcheck}.}
 
-A naive implementation of gradient check can be implemented in the following manner:
+Of course, there is a slight difference -- the definition above only perturbs $x$ in the positive direction to compute the gradient. While it would have been perfectly acceptable to define the numerical gradient in this way, in practice it is often more precise and stable to use the {centered difference formula}, where we perturb a parameter in both directions. The intuition is that to get a better approximation of the derivative/slope around a point, we need to examine the function $f$'s behavior both to the left and right of that point. It can also be shown using Taylor's theorem that the centered difference formula has an error proportional to $\epsilon^2$, which is quite small, whereas the derivative definition is more error-prone.
+
+Now, a natural question you might ask is, if this method is so precise, why do we not use it to compute all of our network gradients instead of applying back-propagation? The simple answer, as hinted earlier, is inefficiency -- recall that every time we want to compute the gradient with respect to an element, we need to make two forward passes through the network, which will be computationally expensive. Furthermore, many large-scale neural networks can contain millions of parameters,and computing two passes per parameter is clearly not optimal. And, since in optimization techniques such as SGD, we must compute the gradients once per iteration for several thousands of iterations, it is obvious that this method quickly grows intractable. This inefficiency is why we only use gradient check to verify the correctness of our analytic gradients, which are much quicker to compute. A standard implementation of gradient check is shown below:
+
+
+% f course, considering how many operations are required for even a forward pass, this is an extremely expensive procedure of evaluating gradients -- as stated eariler, however, is a great way of verifying implementations of the backpropagation however.
 \begin{theorem}
 \begin{verbatim}
 
@@ -311,11 +310,13 @@ def eval_numerical_gradient(f, x):
     old_value = x[ix]
     x[ix] = old_value + h # increment by h
     fxh_left = f(x) # evaluate f(x + h)
+    x[ix] = old_value - h # decrement by h
+    fxh_right = f(x) # evaluate f(x - h)
     x[ix] = old_value # restore to previous value (very 
     			      important!)
 
     # compute the partial derivative
-    grad[ix] = (fxh - fx) / h # the slope
+    grad[ix] = (fxh_left - fxh_right) / (2*h) # the slope
     it.iternext() # step to next dimension
   return grad  
 \end{verbatim}
@@ -323,17 +324,36 @@ def eval_numerical_gradient(f, x):
 \end{theorem}
 \subsection{Regularization}
 
-Like most classifiers, neural networks are also prone to overfitting which causes their validation and test performances to be suboptimal. We can implement $L_2$ regularization such that the loss with regularization, $J_R$, is calculated to be:
+As with many machine learning models, neural networks are highly prone to overfitting, where a model is able to obtain near perfect performance on the training dataset, but loses the ability to generalize to unseen data. A common technique used to address overfitting (an issue also known as the ``high-variance problem'') is the incorporation of an $L_2$ regularization penalty. The idea is that we will simply append an extra term to our loss function $J$, so that the overall cost is now calculated as:
 
 $$J_R = J + \lambda \sum_{i = 1}^{L} \norm{W^{(i)}}_F$$
 
-In the above formulation, $\norm{W^{(i)}}_F$ is the Frobenius norm of the matrix $W^{(i)}$ and $\lambda$ is the relative weight assigned to regularization in the weighted-sum objective. Adding this type of regularization penalizes weights for being large in magnitude by contributing to the cost quadratically with it. This reduces the flexibility of the target function (i.e. classifier) thereby reducing the overfitting phenomenon. Imposing such a constraint can be interpreted as the prior Bayesian belief that the optimal weights are close to zero. How close you wonder? Well, that is what $\lambda$ controls -- large values of $\lambda$ lead to a stronger belief that the weights should be chose to zero. It must be noted that the bias terms are not regularized and do not contribute to the cost term above -- try thinking about why this is the case.
+\marginnote{The \textbf{Frobenius Norm} of a matrix $U$ is defined as follows:
+$$||U||_F = \sum_{i}\sum_{j}U_{ij^2}$$
+}
+
+In the above formulation, $\norm{W^{(i)}}_F$ is the Frobenius norm of the matrix $W^{(i)}$ (the $i$-th weight matrix in the network) and $\lambda$ is the hyper-parameter controlling how much weight the regularization term has relative to the original cost function. Since we are trying to minimize $J_R$, what regularization is essentially doing is penalizing weights for being too large while optimizing over the original cost function. Due to the quadratic nature of the Frobenius norm (which computes the sum of the squared elements of a matrix), $L_2$-regularization effectively reduces the flexibility of the model and thereby reduces the overfitting phenomenon. Imposing such a constraint can also be interpreted as the prior Bayesian belief that the optimal weights are close to zero -- how close depends on the value of $\lambda$. Choosing the right value of $\lambda$ is critical, and must be chosen via hyperparameter-tuning. Too high a value of $\lambda$ causes most of the weights to be set too close to $0$, and the model does not learn anything meaningful from the training data, often obtaining poor accuracy on training, validation, and testing sets. Too low a value, and we fall into the domain of overfitting once again. It must be noted that the bias terms are not regularized and do not contribute to the cost term above -- try thinking about why this is the case!
+
+There are indeed other types of regularization that are sometimes used, such as $L_1$ regularization, which sums over the absolute values (rather than squares) of parameter elements -- however, this is less commonly applied in practice since it leads to sparsity of parameter weights. In the next section, we discuss \textit{dropout}, which effectively acts as another form of regularization by randomly dropping (i.e. setting to zero) neurons in the forward pass.
+
+\subsection{Dropout}
+
+Dropout is a powerful technique for regularization, first introduced by Srivastava et al. in \textit{Dropout: A Simple Way to Prevent Neural Networks from Overfitting}.  The idea is simple yet effective -- during training, we will randomly ``drop'' with some probability $(1-p)$ a subset of neurons during each forward/backward pass (or equivalently, we will keep alive each neuron with a probability $p$). Then, during testing, we will use the full network to compute our predictions. The result is that the network typically learns more meaningful information from the data, is less likely to overfit, and usually obtains higher performance overall on the task at hand. One intuitive reason why this technique should be so effective is that what dropout is doing is essentially doing is training exponentially many smaller networks at once and averaging over their predictions. 
+
+
+\marginnote{
+\includegraphics[width=6cm]{dropout.png}
+{Dropout applied to an artificial neural network. Image credits to Srivastava et al.}
+}
+
+
+In practice, the way we introduce dropout is that we take the output $h$ of each layer of neurons, and keep each neuron with probability $p$, and else set it to $0$. Then, during back-propagation, we only pass gradients through neurons that were kept alive during the forward pass. Finally, during testing, we compute the forward pass using \textit{all} of the neurons in the network. However, a key subtlety is that in order for dropout to work effectively, the expected output of a neuron during testing should be approximately the same as it was during training -- else the magnitude of the outputs could be radically different, and the behavior of the network is no longer well-defined. Thus, we must typically divide the outputs of each neuron during testing by a certain value --  it is left as an exercise to the reader to determine what this value should be in order for the expected outputs during training and testing to be equivalent.
 
 \subsection{Neuron Units}
 
-So far we have discussed neural networks that contain sigmoidal neurons to allow nonlinearities, however in many applications better networks can be designed using other activation functions. Some common choices are listed here with their function and gradient definitions and these can be substituted with the sigmoidal functions discussed above.
+So far we have discussed neural networks that contain sigmoidal neurons to introduce nonlinearities; however in many applications better networks can be designed using other activation functions. Some common choices are listed here with their function and gradient definitions and these can be substituted with the sigmoidal functions discussed above.
 $$ $$
-\textbf{Sigmoid:} This is the default choice we have discussed and the activation function $\sigma$ is:
+\textbf{Sigmoid:} This is the default choice we have discussed; the activation function $\sigma$ is given by:
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{graph_sigmoid}
   \caption{The response of a sigmoid nonlinearity}
@@ -411,11 +431,13 @@ The derivative is then the piecewise function:
    \right.
 \end{displaymath} 
 \textbf{Leaky ReLU:} Traditional ReLU units by design do not propagate any error for non-positive $z$ -- the leaky ReLU modifies this such that a small error is allowed to propagate backwards even when $z$ is negative:
+
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{graph_leaky}
   \caption{The response of a leaky ReLU nonlinearity}
   \label{fig:graph_leaky}
 \end{marginfigure}
+
 $$\operatorname{leaky}(z) = \operatorname{max}(z, k\cdot z)$$
 $$\text{where } 0<k<1$$
 This way, the derivative is representable as:
@@ -428,17 +450,36 @@ This way, the derivative is representable as:
    \right.
 \end{displaymath} 
 
-\subsection{Xavier Parameter Initialization}
+\subsection{Data Preprocessing}
+As is the case with machine learning models generally, a key step to ensuring that your model obtains reasonable performance on the task at hand is to perform basic preprocessing on your data. Some common techniques are outlined below.\\
+\vspace{6mm}
 
-In \textsc{Understanding the difficulty of training deep feedforward neural networks (2010), Xavier et al} study the effect of different weight and bias initialization schemes on training dynamics. The empirical findings suggest that for sigmoid and tanh activation units, lower error rates are achieved and faster convergence occurs when the weights of a matrix $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$ are initialized randomly with a uniform distribution with the following range:
+\noindent\textbf{Mean Subtraction}\\
+
+\noindent{}Given a set of input data $X$, it is customary to zero-center the data by subtracting the mean feature vector of $X$ from $X$. An important point is that in practice, the mean is calculated only across the training set, and this mean is subtracted from the training, validation, and testing sets.\\
+\vspace{6mm}
+
+\noindent\textbf{Normalization}\\
+
+\noindent{}Another frequently used technique (though perhaps less so than mean subtraction) is to scale every input feature dimension to have similar ranges of magnitudes. This is useful since input features are often measured in different ``units'', but we often want to initially consider all features as equally important. The way we accomplish this is by simply dividing the features by their respective standard deviation calculated across the training set.\\
+\vspace{6mm}
+
+\noindent\textbf{Whitening}\\
+
+\noindent{}Not as commonly used as mean-subtraction + normalization, whitening essentially converts the data to a have an identity covariance matrix -- that is, features become uncorrelated and have a variance of $1$.  This is done by first mean-subtracting the data, as usual, to get $X'$. We can then take the Singular Value Decomposition (SVD) of $X'$ to get matrices $U, S, V$. We then compute $UX'$ to project  $X'$ into the basis defined by the columns of $U$. We finally divide each dimension of the result by the corresponding singular value in $S$ to scale our data appropriately (if a singular value is zero, we can just divide by a small number instead).
+
+
+\subsection{Parameter Initialization}
+
+A key step towards achieving superlative performance with a neural network is initializing the parameters in a reasonable way.  A good starting strategy is to initialize the weights to small random numbers normally distributed around $0$ -- and in practice, this often words acceptably well.
+However, in \textsc{Understanding the difficulty of training deep feedforward neural networks (2010), Xavier et al} study the effect of different weight and bias initialization schemes on training dynamics. The empirical findings suggest that for sigmoid and tanh activation units, faster convergence and lower error rates are achieved when the weights of a matrix $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$ are initialized randomly with a uniform distribution as follows:
 $$W \sim U\bigg[-\sqrt{\frac{6}{n^{(l)} + n^{(l+1)}}}, \sqrt{\frac{6}{n^{(l)} + n^{(l+1)}}}\bigg]$$
-$$\text{Where } n^{(l)} \text{ is the number of input units to $W$ (fan-in)}$$
-$$\text{and } n^{(l+1)} \text{ is the number of output units from $W$ (fan-out)}$$
+Where $n^{(l)}$ is the number of input units to $W$ (fan-in) and  $n^{(l+1)}$ is the number of output units from $W$ (fan-out).
 In this parameter initialization scheme, bias units are initialized to $0$. This approach attempts to maintain activation variances as well as backpropagated gradient variances across layers. Without such initialization, the gradient variances (which are a proxy for information) generally decrease with backpropagation across layers.
-\subsection{Learning Rate}
-The speed at which a parameter in the model updates can be controlled using the learning rate. In the following naive gradient descent formulation, $\alpha$ is the learning rate:
+\subsection{Learning Strategies}
+The rate/magnitude of model parameter updates during training can be controlled using the learning rate. In the following naive Gradient Descent formulation, $\alpha$ is the learning rate:
 $$ \theta^{\text{new}} = \theta^{\text{old}} - \alpha \nabla_{\theta}J_t(\theta)$$
-You might think that for fast convergence rates, we should set $\alpha$ to larger values however faster convergence is not guaranteed with larger convergence rates. In fact, with very large learning rates, we might experience that the loss function actually diverges because the parameters update causes the model to overshoot the convex minima as shown in Figure~\ref{fig:ErrorSurf}. In non-convex models (most of those we work with), the outcome of a large learning rate is unpredictable but the chances of diverging loss functions are very high.
+You might think that for fast convergence rates, we should set $\alpha$ to larger values -- however faster convergence is not guaranteed with larger convergence rates. In fact, with very large learning rates, we might experience that the loss function actually diverges because the parameters update causes the model to overshoot the convex minima as shown in Figure~\ref{fig:ErrorSurf}. In non-convex models (most of those we work with), the outcome of a large learning rate is unpredictable, but the chances of diverging loss functions are very high .
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{Error_Surf}
@@ -446,13 +487,34 @@ You might think that for fast convergence rates, we should set $\alpha$ to large
   \label{fig:ErrorSurf}
 \end{marginfigure}
 
-The simple solution to avoiding a diverging loss is to use a very small learning rate so that we carefully scan the parameter space. Furthermore, we can keep this learning rate fixed for all parameters in the model instead of having a more complex scheme in which each parameter has its own learning rate.
+The simple solution to avoiding a diverging loss is to use a very small learning rate so that we carefully scan the parameter space -- of course, if we use too small a learning rate, we might not converge in a reasonable amount of time, or might get caught in a local minima.  Thus, as with any other hyperparameter, the learning rate must be tuned effectively.
 
-Since training is the most expensive phase in a deep learning system, some research has attempted to improve this naive approach to setting learning learning rates. For instance, \textsc{Ronan Collobert} scales the learning rate of a weight $W_{ij}$  (where $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$) by the inverse square root of the fan-in of the neuron ($n^{(l)}$). Another approach is to allow the learning rate to decrease over time such that:
+% Furthermore, we can keep this learning rate fixed for all parameters in the model instead of having a more complex scheme in which each parameter has its own learning rate.
+
+Since training is the most expensive phase in a deep learning system, some research has attempted to improve this naive approach to setting learning learning rates. For instance, \textsc{Ronan Collobert} scales the learning rate of a weight $W_{ij}$  (where $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$) by the inverse square root of the fan-in of the neuron ($n^{(l)}$). 
+
+There are several other techniques that have proven to be effective as well -- one such method is \textbf{annealing}, where, after several iterations, the learning rate is reduced in some way -- this method ensures that we start off with a high learning rate and approach a minima quickly; as we get closer to the minima, we start lowering our learning rate so that we can find the optima under a more fine-grained scope. A common way to perform annealing is to reduce the learning rate $\alpha$ by a factor $x$ after every $n$ iterations of learning. Exponential decay is also common, where, the learning rate $\alpha$ at iteration $t$ is given by $\alpha(t) = \alpha_0e^{-kt}$, where $\alpha_0$ is the initial learning rate, and $k$ is a hyperparameter. Another approach is to allow the learning rate to decrease over time such that:
 $$ \alpha(t) = \frac{\alpha_0\tau}{\max(t, \tau)}$$
 In the above scheme, $\alpha_0$ is a tunable parameter and represents the starting learning rate. $\tau$ is also a tunable parameter and represents the time at which the learning rate should start reducing. In practice, this method has been found to work quite well. In the next section we discuss another method for adaptive gradient descent which does not require hand-set learning rates.
 
-\subsection{Subgradient Optimization Using AdaGrad}
+
+\subsection{Momentum Updates}
+
+Momentum methods, a variant of gradient descent inspired by the study of dynamics and motion in physics, attempt to use the ``velocity'' of updates as a more effective update scheme. Pseudocode for momentum updates is shown below:
+
+\begin{theorem}
+\begin{verbatim}
+
+# Computes a standard momentum update
+# on parameters x
+v = mu*v - alpha*grad_x
+x += v
+\end{verbatim}
+\label{snip:momentup}
+\end{theorem}
+
+
+\subsection{Adaptive Optimization Methods}
 
 AdaGrad is an implementation of standard stochastic gradient descent (SGD) with one key difference: the learning rate can vary for each parameter. The learning rate for each parameter depends on the history of gradient updates of that parameter in a way such that parameters with a scarce history of updates are updated faster using a larger learning rate. In other words, parameters that have not been updated much in the past are likelier to have higher learning rates now. Formally:
 
@@ -468,5 +530,33 @@ x += - learning_rate * dx / np.sqrt(cache + 1e-8)
 \end{verbatim}
 \label{snip:adagrad}
 \end{theorem}
+Other common adaptive methods are RMSProp and Adam, whose update rules are shown below (courtesy of Andrej Karpathy):
+
+\begin{theorem}
+\begin{verbatim}
+
+# Update rule for RMS prop
+cache = decay_rate * cache + (1 - decay_rate) * dx**2
+x += - learning_rate * dx / (np.sqrt(cache) + eps)
+\end{verbatim}
+\label{snip:rmsprop}
+\end{theorem}
+
+\begin{theorem}
+\begin{verbatim}
+
+# Update rule for Adam
+m = beta1*m + (1-beta1)*dx
+v = beta2*v + (1-beta2)*(dx**2)
+x += - learning_rate * m / (np.sqrt(v) + eps)
+\end{verbatim}
+\label{snip:adam}
+\end{theorem}
+RMSProp is a variant of AdaGrad that utilizes a moving average of squared gradients -- in particular, unlike AdaGrad, its updates do not become monotonically smaller. The Adam update rule is in turn a variant of RMSProp, but with the addition of momentum-like updates. We refer the reader to the respective sources of these methods for more detailed analyses of their behavior.
+
+
+
+
+
 
 \end{document}
