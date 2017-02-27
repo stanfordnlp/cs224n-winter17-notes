@@ -206,7 +206,7 @@ We see above that the gradient reduces to the product $\delta_i^{(2)} \cdot a_j^
   \label{fig:ErrorSignal}
 \end{marginfigure}
 
-Let us discuss the "error sharing/distribution" interpretation of  backpropagation better using Figure~\ref{fig:ErrorSignal} as an example. Say we were to update $W^{(1)}_{14}$:
+Let us discuss the "error sharing/distribution" interpretation of backpropagation better using Figure~\ref{fig:ErrorSignal} as an example. Say we were to update $W^{(1)}_{14}$:
 \begin{enumerate}
 \item We start with the an error signal of 1 propagating backwards from $a_1^{(3)}$.
 \item We then multiply this error by the local gradient of the neuron which maps $z_1^{(3)}$ to $a_1^{(3)}$. This happens to be $1$ in this case and thus, the error is still 1. This is now known as $\delta_1^{(3)} = 1$.
@@ -281,7 +281,7 @@ $$f'(x) \approx \dfrac{f(x + \epsilon) - f(x)}{\epsilon}$$
 
 Of course, there is a slight difference -- the definition above only perturbs $x$ in the positive direction to compute the gradient. While it would have been perfectly acceptable to define the numerical gradient in this way, in practice it is often more precise and stable to use the {centered difference formula}, where we perturb a parameter in both directions. The intuition is that to get a better approximation of the derivative/slope around a point, we need to examine the function $f$'s behavior both to the left and right of that point. It can also be shown using Taylor's theorem that the centered difference formula has an error proportional to $\epsilon^2$, which is quite small, whereas the derivative definition is more error-prone.
 
-Now, a natural question you might ask is, if this method is so precise, why do we not use it to compute all of our network gradients instead of applying back-propagation? The simple answer, as hinted earlier, is inefficiency -- recall that every time we want to compute the gradient with respect to an element, we need to make two forward passes through the network, which will be computationally expensive. Furthermore, many large-scale neural networks can contain millions of parameters,and computing two passes per parameter is clearly not optimal. And, since in optimization techniques such as SGD, we must compute the gradients once per iteration for several thousands of iterations, it is obvious that this method quickly grows intractable. This inefficiency is why we only use gradient check to verify the correctness of our analytic gradients, which are much quicker to compute. A standard implementation of gradient check is shown below:
+Now, a natural question you might ask is, if this method is so precise, why do we not use it to compute all of our network gradients instead of applying back-propagation? The simple answer, as hinted earlier, is inefficiency -- recall that every time we want to compute the gradient with respect to an element, we need to make two forward passes through the network, which will be computationally expensive. Furthermore, many large-scale neural networks can contain millions of parameters, and computing two passes per parameter is clearly not optimal. And, since in optimization techniques such as SGD, we must compute the gradients once per iteration for several thousands of iterations, it is obvious that this method quickly grows intractable. This inefficiency is why we only use gradient check to verify the correctness of our analytic gradients, which are much quicker to compute. A standard implementation of gradient check is shown below:
 
 
 % f course, considering how many operations are required for even a forward pass, this is an extremely expensive procedure of evaluating gradients -- as stated eariler, however, is a great way of verifying implementations of the backpropagation however.
@@ -329,7 +329,7 @@ As with many machine learning models, neural networks are highly prone to overfi
 $$J_R = J + \lambda \sum_{i = 1}^{L} \norm{W^{(i)}}_F$$
 
 \marginnote{The \textbf{Frobenius Norm} of a matrix $U$ is defined as follows:
-$$||U||_F = \sum_{i}\sum_{j}U_{ij^2}$$
+$$||U||_F = \sqrt{ \sum_{i}\sum_{j}U_{ij}^2 }$$
 }
 
 In the above formulation, $\norm{W^{(i)}}_F$ is the Frobenius norm of the matrix $W^{(i)}$ (the $i$-th weight matrix in the network) and $\lambda$ is the hyper-parameter controlling how much weight the regularization term has relative to the original cost function. Since we are trying to minimize $J_R$, what regularization is essentially doing is penalizing weights for being too large while optimizing over the original cost function. Due to the quadratic nature of the Frobenius norm (which computes the sum of the squared elements of a matrix), $L_2$-regularization effectively reduces the flexibility of the model and thereby reduces the overfitting phenomenon. Imposing such a constraint can also be interpreted as the prior Bayesian belief that the optimal weights are close to zero -- how close depends on the value of $\lambda$. Choosing the right value of $\lambda$ is critical, and must be chosen via hyperparameter-tuning. Too high a value of $\lambda$ causes most of the weights to be set too close to $0$, and the model does not learn anything meaningful from the training data, often obtaining poor accuracy on training, validation, and testing sets. Too low a value, and we fall into the domain of overfitting once again. It must be noted that the bias terms are not regularized and do not contribute to the cost term above -- try thinking about why this is the case!
@@ -347,7 +347,7 @@ Dropout is a powerful technique for regularization, first introduced by Srivasta
 }
 
 
-In practice, the way we introduce dropout is that we take the output $h$ of each layer of neurons, and keep each neuron with probability $p$, and else set it to $0$. Then, during back-propagation, we only pass gradients through neurons that were kept alive during the forward pass. Finally, during testing, we compute the forward pass using \textit{all} of the neurons in the network. However, a key subtlety is that in order for dropout to work effectively, the expected output of a neuron during testing should be approximately the same as it was during training -- else the magnitude of the outputs could be radically different, and the behavior of the network is no longer well-defined. Thus, we must typically divide the outputs of each neuron during testing by a certain value --  it is left as an exercise to the reader to determine what this value should be in order for the expected outputs during training and testing to be equivalent.
+In practice, the way we introduce dropout is that we take the output $h$ of each layer of neurons, and keep each neuron with probability $p$, and else set it to $0$. Then, during back-propagation, we only pass gradients through neurons that were kept alive during the forward pass. Finally, during testing, we compute the forward pass using \textit{all} of the neurons in the network. However, a key subtlety is that in order for dropout to work effectively, the expected output of a neuron during testing should be approximately the same as it was during training -- else the magnitude of the outputs could be radically different, and the behavior of the network is no longer well-defined. Thus, we must typically divide the outputs of each neuron during testing by a certain value -- it is left as an exercise to the reader to determine what this value should be in order for the expected outputs during training and testing to be equivalent.
 
 \subsection{Neuron Units}
 
@@ -365,7 +365,7 @@ $$ $$
 \end{align*}
 The gradient of $ \sigma(z) $ is:
 $$ \sigma'(z) = \frac{- \operatorname{exp}(-z)}{1 +  \operatorname{exp}(-z)} = \sigma(z) (1 - \sigma(z))$$
-\textbf{Tanh:} The tanh functionis an alternative to the sigmoid function that is often found to converge faster in practice. The primary difference between tanh and sigmoid is that tanh output ranges from $-1$ to $1$ while the sigmoid ranges from $0$ to $1$.
+\textbf{Tanh:} The tanh function is an alternative to the sigmoid function that is often found to converge faster in practice. The primary difference between tanh and sigmoid is that tanh output ranges from $-1$ to $1$ while the sigmoid ranges from $0$ to $1$.
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{graph_tanh}
   \caption{The response of a tanh nonlinearity}
@@ -479,7 +479,7 @@ In this parameter initialization scheme, bias units are initialized to $0$. This
 \subsection{Learning Strategies}
 The rate/magnitude of model parameter updates during training can be controlled using the learning rate. In the following naive Gradient Descent formulation, $\alpha$ is the learning rate:
 $$ \theta^{\text{new}} = \theta^{\text{old}} - \alpha \nabla_{\theta}J_t(\theta)$$
-You might think that for fast convergence rates, we should set $\alpha$ to larger values -- however faster convergence is not guaranteed with larger convergence rates. In fact, with very large learning rates, we might experience that the loss function actually diverges because the parameters update causes the model to overshoot the convex minima as shown in Figure~\ref{fig:ErrorSurf}. In non-convex models (most of those we work with), the outcome of a large learning rate is unpredictable, but the chances of diverging loss functions are very high .
+You might think that for fast convergence rates, we should set $\alpha$ to larger values -- however faster convergence is not guaranteed with larger convergence rates. In fact, with very large learning rates, we might experience that the loss function actually diverges because the parameters update causes the model to overshoot the convex minima as shown in Figure~\ref{fig:ErrorSurf}. In non-convex models (most of those we work with), the outcome of a large learning rate is unpredictable, but the chances of diverging loss functions are very high.
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{Error_Surf}
@@ -487,13 +487,13 @@ You might think that for fast convergence rates, we should set $\alpha$ to large
   \label{fig:ErrorSurf}
 \end{marginfigure}
 
-The simple solution to avoiding a diverging loss is to use a very small learning rate so that we carefully scan the parameter space -- of course, if we use too small a learning rate, we might not converge in a reasonable amount of time, or might get caught in a local minima.  Thus, as with any other hyperparameter, the learning rate must be tuned effectively.
+The simple solution to avoiding a diverging loss is to use a very small learning rate so that we carefully scan the parameter space -- of course, if we use too small a learning rate, we might not converge in a reasonable amount of time, or might get caught in local minima.  Thus, as with any other hyperparameter, the learning rate must be tuned effectively.
 
 % Furthermore, we can keep this learning rate fixed for all parameters in the model instead of having a more complex scheme in which each parameter has its own learning rate.
 
 Since training is the most expensive phase in a deep learning system, some research has attempted to improve this naive approach to setting learning learning rates. For instance, \textsc{Ronan Collobert} scales the learning rate of a weight $W_{ij}$  (where $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$) by the inverse square root of the fan-in of the neuron ($n^{(l)}$). 
 
-There are several other techniques that have proven to be effective as well -- one such method is \textbf{annealing}, where, after several iterations, the learning rate is reduced in some way -- this method ensures that we start off with a high learning rate and approach a minima quickly; as we get closer to the minima, we start lowering our learning rate so that we can find the optima under a more fine-grained scope. A common way to perform annealing is to reduce the learning rate $\alpha$ by a factor $x$ after every $n$ iterations of learning. Exponential decay is also common, where, the learning rate $\alpha$ at iteration $t$ is given by $\alpha(t) = \alpha_0e^{-kt}$, where $\alpha_0$ is the initial learning rate, and $k$ is a hyperparameter. Another approach is to allow the learning rate to decrease over time such that:
+There are several other techniques that have proven to be effective as well -- one such method is \textbf{annealing}, where, after several iterations, the learning rate is reduced in some way -- this method ensures that we start off with a high learning rate and approach a minimum quickly; as we get closer to the minimum, we start lowering our learning rate so that we can find the optimum under a more fine-grained scope. A common way to perform annealing is to reduce the learning rate $\alpha$ by a factor $x$ after every $n$ iterations of learning. Exponential decay is also common, where, the learning rate $\alpha$ at iteration $t$ is given by $\alpha(t) = \alpha_0e^{-kt}$, where $\alpha_0$ is the initial learning rate, and $k$ is a hyperparameter. Another approach is to allow the learning rate to decrease over time such that:
 $$ \alpha(t) = \frac{\alpha_0\tau}{\max(t, \tau)}$$
 In the above scheme, $\alpha_0$ is a tunable parameter and represents the starting learning rate. $\tau$ is also a tunable parameter and represents the time at which the learning rate should start reducing. In practice, this method has been found to work quite well. In the next section we discuss another method for adaptive gradient descent which does not require hand-set learning rates.
 

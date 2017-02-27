@@ -133,7 +133,7 @@ The loss function used in RNNs is often the cross entropy error introduced in ea
 
 The cross entropy error over a corpus of size $T$ is:
 \begin{equation}
-	J = - \dfrac{1}{T} \sum_{t=1}^{T} J^{(t)}(\theta) = - \dfrac{1}{T} \sum_{t=1}^{T} \sum_{j=1}^{|V|} y_{t,j} \times log (\hat{y}_{t,j})
+	J = \dfrac{1}{T} \sum_{t=1}^{T} J^{(t)}(\theta) = - \dfrac{1}{T} \sum_{t=1}^{T} \sum_{j=1}^{|V|} y_{t,j} \times log (\hat{y}_{t,j})
 	\label {eqn:rnn_loss_T}
 \end{equation}
 
@@ -154,7 +154,7 @@ Equation~\ref{eqn:perplexity} is called the \textit{perplexity} relationship; it
 
 The amount of memory required to run a layer of RNN is proportional to the number of words in the corpus. For instance, a sentence with k words would have k word vectors to be stored in memory. Also, the RNN must maintain two pairs of  $W, b$ matrices. While the size of W could be very large, it does not scale with the size of the corpus (unlike the traditional language models). For a RNN with 1000 recurrent layers, the matrix would be $1000 \times 1000$ regardless of the corpus size.
 
-Figure~\ref{fig:rnn_loop} is an alternative representation of RNNs used in some publications. It representsRNNs the RNN hidden layer as a loop.
+Figure~\ref{fig:rnn_loop} is an alternative representation of RNNs used in some publications. It represents the RNN hidden layer as a loop.
 \begin{marginfigure}
 	\centering
 	\includegraphics[width=\linewidth]{rnn_loop.pdf}
@@ -344,7 +344,7 @@ Traditional translation models are quite complex; they consist of numerous machi
 One may naively assume this RNN model along with the cross-entropy function shown in Equation~\ref{eqn:decoder_ce} can produce high-accuracy translation results. In practice, however, several extensions are to be added to the model to improve its translation accuracy performance.
 
 \begin{equation}
-	max_{\theta} \dfrac {1}{N} \sum_{n=1}^{N} \times log (p_{\theta} (y^{(n)}|x^{(n)}))
+	\max_{\theta} \dfrac {1}{N} \sum_{n=1}^{N} \log p_{\theta} (y^{(n)}|x^{(n)})
 	\label{eqn:decoder_ce}
 \end{equation}
 
