@@ -331,8 +331,7 @@ As with many machine learning models, neural networks are highly prone to overfi
 $$J_R = J + \lambda \sum_{i = 1}^{L} \norm{W^{(i)}}_F$$
 
 \marginnote{The \textbf{Frobenius Norm} of a matrix $U$ is defined as follows:
-
-$$||U||_F = \sqrt{ \sum_{i}\sum_{j}U_{ij}^2 }$$
+$$||U||_F = \sqrt{ \sum_{i}\sum_{j}U_{ij}^2 }$$}
 
 
 In the above formulation, $\norm{W^{(i)}}_F$ is the Frobenius norm of the matrix $W^{(i)}$ (the $i$-th weight matrix in the network) and $\lambda$ is the hyper-parameter controlling how much weight the regularization term has relative to the original cost function. Since we are trying to minimize $J_R$, what regularization is essentially doing is penalizing weights for being too large while optimizing over the original cost function. Due to the quadratic nature of the Frobenius norm (which computes the sum of the squared elements of a matrix), $L_2$-regularization effectively reduces the flexibility of the model and thereby reduces the overfitting phenomenon. Imposing such a constraint can also be interpreted as the prior Bayesian belief that the optimal weights are close to zero -- how close depends on the value of $\lambda$. Choosing the right value of $\lambda$ is critical, and must be chosen via hyperparameter-tuning. Too high a value of $\lambda$ causes most of the weights to be set too close to $0$, and the model does not learn anything meaningful from the training data, often obtaining poor accuracy on training, validation, and testing sets. Too low a value, and we fall into the domain of overfitting once again. It must be noted that the bias terms are not regularized and do not contribute to the cost term above -- try thinking about why this is the case!

@@ -133,9 +133,7 @@ The loss function used in RNNs is often the cross entropy error introduced in ea
 
 The cross entropy error over a corpus of size $T$ is:
 \begin{equation}
-
 	J = \dfrac{1}{T} \sum_{t=1}^{T} J^{(t)}(\theta) = - \dfrac{1}{T} \sum_{t=1}^{T} \sum_{j=1}^{|V|} y_{t,j} \times log (\hat{y}_{t,j})
-
 	\label {eqn:rnn_loss_T}
 \end{equation}
 
