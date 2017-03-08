@@ -133,7 +133,9 @@ The loss function used in RNNs is often the cross entropy error introduced in ea
 
 The cross entropy error over a corpus of size $T$ is:
 \begin{equation}
+
 	J = \dfrac{1}{T} \sum_{t=1}^{T} J^{(t)}(\theta) = - \dfrac{1}{T} \sum_{t=1}^{T} \sum_{j=1}^{|V|} y_{t,j} \times log (\hat{y}_{t,j})
+
 	\label {eqn:rnn_loss_T}
 \end{equation}
 
@@ -155,6 +157,7 @@ Equation~\ref{eqn:perplexity} is called the \textit{perplexity} relationship; it
 The amount of memory required to run a layer of RNN is proportional to the number of words in the corpus. For instance, a sentence with k words would have k word vectors to be stored in memory. Also, the RNN must maintain two pairs of  $W, b$ matrices. While the size of W could be very large, it does not scale with the size of the corpus (unlike the traditional language models). For a RNN with 1000 recurrent layers, the matrix would be $1000 \times 1000$ regardless of the corpus size.
 
 Figure~\ref{fig:rnn_loop} is an alternative representation of RNNs used in some publications. It represents the RNN hidden layer as a loop.
+
 \begin{marginfigure}
 	\centering
 	\includegraphics[width=\linewidth]{rnn_loop.pdf}
