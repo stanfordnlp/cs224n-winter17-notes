@@ -1,8 +1,6 @@
 \documentclass{tufte-handout}
 
-\title{Review of differential calculus theory}
-
-\author[Guillaume Genthial]{Derivatives, differential, gradients, jacobians and the chain rule\thanks{Author: Guillaume Genthial}}
+\title{Review of differential calculus theory \thanks{Author: Guillaume Genthial}}
 
 
 \date{Winter 2017} % without \date command, current date is supplied
@@ -61,7 +59,7 @@
 \section{Introduction}
 
 
-We use derivatives all the time, but we forget what they mean. In general, we have in mind that for a function $ f : \mathbb{R} \mapsto \mathbb{R} $, we have something like 
+We use derivatives all the time, but we forget what they mean. In general, we have in mind that for a function $ f : \mathbb{R} \mapsto \mathbb{R} $, we have something like
 
 $$ f(x+h) - f(x) \approx f'(x)h $$
 
@@ -104,9 +102,9 @@ f(x + h) = f(x) + \ud_x f (h) + o_{h \rightarrow 0}(h)
 \marginnote{ $ o_{h \rightarrow 0}(h) $ (Landau notation) is equivalent to the existence of a function $ \epsilon(h) $ such that $ \lim\limits_{h \rightarrow 0} \epsilon(h) = 0 $}
 
  and $ \ud_x f : \mathbb{R}^n \mapsto \mathbb{R} $ is a linear form, which means that $ \forall x, y \in \mathbb{R}^n $ , we have $ \ud_x f(x + y) = \ud_x f(x) + \ud_x f(y)$.
- 
+
  \textbf{Example}
- 
+
  Let $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that $ f(\begin{pmatrix}
  x_1 \\ x_2
  \end{pmatrix}) = 3x_1 + x_2^2 $. Let's pick $ \begin{pmatrix}
@@ -115,11 +113,11 @@ f(x + h) = f(x) + \ud_x f (h) + o_{h \rightarrow 0}(h)
  \end{pmatrix}\in \mathbb{R}^2 $ and $ h = \begin{pmatrix}
  h_1 \\
  h_2
- \end{pmatrix}\in \mathbb{R}^2 $. We have 
-                     
+ \end{pmatrix}\in \mathbb{R}^2 $. We have
+
  \begin{align*}
  f(\begin{pmatrix}
- a + h_1\\ 
+ a + h_1\\
  b + h_2
  \end{pmatrix}) &= 3(a + h_1) + (b + h_2)^2\\
  					&= 3 a + 3h_1 + b^2 + 2 b h_2 + h_2^2\\
@@ -138,19 +136,19 @@ h_2
 
  \subsection{Link with the gradients}
  \marginnote{\textbf{Notation} for $ x \in \mathbb{R}^n $, the gradient is usually written $ \nabla_x f \in \mathbb{R}^n $ $$ $$}
- 
- 
- 
+
+
+
  \textbf{Formal definition}
- 
+
  It can be shown that for all linear forms $ a : \mathbb{R}^n \mapsto \mathbb{R} $, there exists a vector $ u_a \in \mathbb{R}^n $ such that $ \forall h \in \mathbb{R}^n $
- 
+
  \marginnote{The dual of a vector space $ E^* $ is isomorphic to $ E $\\
  See Riesz representation theorem}
- 
+
 $$ a(h) =  \langle u_a  | h \rangle $$
 
-In particular, for the \textbf{differential} $ \ud_x f $, we can find a vector $ u \in \mathbb{R}^n $ such that 
+In particular, for the \textbf{differential} $ \ud_x f $, we can find a vector $ u \in \mathbb{R}^n $ such that
 
 $$ \ud_x (h) = \langle u | h \rangle $$.
 
@@ -176,7 +174,7 @@ f(x + h) &= f(x) + \ud_x f (h) + o_{h \rightarrow 0}(h)\\
 Same example as before, $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that $ f(\begin{pmatrix}
 x_1 \\
 x_2
-\end{pmatrix}) = 3x_1 + x_2^2 $. We showed that 
+\end{pmatrix}) = 3x_1 + x_2^2 $. We showed that
 
 $$ \ud_{\begin{pmatrix}
 a \\
@@ -186,7 +184,7 @@ h_1\\
 h_2
 \end{pmatrix}) =  3 h_1 + 2 b h_2 $$
 
-We can rewrite this as 
+We can rewrite this as
 
 $$ \ud_{\begin{pmatrix}
 a \\
@@ -202,18 +200,18 @@ h_1 \\
 h_2
 \end{pmatrix} \rangle  $$
 
-and thus our gradient is 
+and thus our gradient is
 
 $$ \nabla_{\begin{pmatrix}
 a \\
 b
 \end{pmatrix}}f = \begin{pmatrix}
-3 \\ 
+3 \\
 2b
 \end{pmatrix} $$
 
 \subsection{Partial derivatives}
-\marginnote{\textbf{Notation}\\ 
+\marginnote{\textbf{Notation}\\
 Partial derivatives are usually written $  \frac{\partial f}{\partial x} $ but you may also see $ \partial_{x} f $ or $ f'_x$
  \begin{itemize}
 \item $ \frac{\partial f}{\partial x_i} $ is a \textbf{function} $ \mathbb{R}^n \mapsto \mathbb{R} $
@@ -233,7 +231,7 @@ Note that the partial derivative $ \frac{\partial f}{\partial x_i}(x) \in \mathb
 
 \textbf{Example}
 
-Same example as before, $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that $ f(x_1,x_2) = 3x_1 + x_2^2 $. Let's write 
+Same example as before, $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that $ f(x_1,x_2) = 3x_1 + x_2^2 $. Let's write
 
 \marginnote{Depending on the context, most people omit to write the $ (x) $ evaluation and just write \\
 $ \frac{\partial f}{\partial x} \in \mathbb{R}^n $ instead of $ \frac{\partial f}{\partial x} (x) $}
@@ -250,22 +248,22 @@ a \\b
 &= 3
 \end{align*}
 
-In a similar way, we find that 
+In a similar way, we find that
 
 $$ \frac{\partial f}{\partial x_2}(\begin{pmatrix}
 a \\ b
 \end{pmatrix}) = 2b $$
 
  \subsection{Link with the partial derivatives}
- \marginnote{That's why we usually write 
- $$ \nabla_x f = \frac{\partial f}{\partial x}(x)$$ 
+ \marginnote{That's why we usually write
+ $$ \nabla_x f = \frac{\partial f}{\partial x}(x)$$
  (\textbf{same shape as $ x $}) $$ $$}
- 
+
  \textbf{Formal definition}
- 
- It can be shown that 
+
+ It can be shown that
  \marginnote{$e_i$ is a orthonormal basis. For instance, in the canonical basis\\
- $$ e_i = (0, \ldots, 1, \ldots 0) $$ with $ 1 $ at index $ i $} 
+ $$ e_i = (0, \ldots, 1, \ldots 0) $$ with $ 1 $ at index $ i $}
  \begin{align*}
   \nabla_x f &= \sum_{i=1}^{n} \frac{\partial f}{\partial x_i}(x) e_i\\
   			&= \begin{pmatrix}
@@ -275,13 +273,13 @@ a \\ b
   			\end{pmatrix}
  \end{align*}
 
- 
+
  where $ \frac{\partial f}{\partial x_i} (x) $ denotes the partial derivative of $ f $ with respect to the $ i $th component, evaluated in $ x $.
- 
+
  \textbf{Example}
- 
- We showed that 
- 
+
+ We showed that
+
 $$ \begin{cases}
 \frac{\partial f}{\partial x_1}(\begin{pmatrix}
 a\\b
@@ -289,9 +287,9 @@ a\\b
 \frac{\partial f}{\partial x_2}(\begin{pmatrix}
 a \\ b
 \end{pmatrix}) &= 2b
-\end{cases}$$ 
+\end{cases}$$
 
-and that 
+and that
 
 $$ \nabla_{\begin{pmatrix}
 a \\ b
@@ -299,14 +297,14 @@ a \\ b
 3 \\ 2b
 \end{pmatrix} $$
 
-and then we verify that 
+and then we verify that
 
 $$ \nabla_{\begin{pmatrix}
 a \\ b
 \end{pmatrix}}f = \begin{pmatrix}
 \frac{\partial f}{\partial x_1}(\begin{pmatrix}
 a \\ b
-\end{pmatrix})\\ 
+\end{pmatrix})\\
 \frac{\partial f}{\partial x_2}(\begin{pmatrix}
 a \\ b
 \end{pmatrix})
@@ -337,13 +335,13 @@ That's why the following expression has some meaning,
 
 $$ \ud_x f (\cdot) =  \frac{\partial f}{\partial x}(x) \ud x (\cdot) $$
 
-because 
+because
 
 \begin{align*}
 \ud_x f (h) &=  \frac{\partial f}{\partial x}(x)  \ud x (h) \\
-&= \frac{\partial f}{\partial x}(x)  h 
+&= \frac{\partial f}{\partial x}(x)  h
 \end{align*}
-In higher dimension, we write 
+In higher dimension, we write
 
 $$ \ud_x f = \sum_{i=1}^n \frac{\partial f}{\partial x_i}(x) \ud x_i $$
 
@@ -351,12 +349,12 @@ $$ \ud_x f = \sum_{i=1}^n \frac{\partial f}{\partial x_i}(x) \ud x_i $$
 \label{sec:gen}
 For a function
 
-$$ f: 
+$$ f:
 \begin{pmatrix}
 x_1\\
 \vdots\\
 x_n
-\end{pmatrix} \mapsto 
+\end{pmatrix} \mapsto
 \begin{pmatrix}
 f_1(x_1, \ldots, x_n)\\
 \vdots\\
@@ -364,7 +362,7 @@ f_m(x_1, \ldots, x_n)\\
 \end{pmatrix}
 $$
 
-We can apply the previous section to each $ f_i(x) $ : 
+We can apply the previous section to each $ f_i(x) $ :
 
 \begin{align*}
 f_i(x+h) &= f_i(x) + \ud_x f_i(h) + o_{h \rightarrow 0} (h) \\
@@ -384,30 +382,30 @@ x_n + h_n
 x_1\\
 \vdots\\
 x_n
-\end{pmatrix} + 
+\end{pmatrix} +
 \begin{pmatrix}
 \frac{\partial f_1}{\partial x}(x)^T \cdot h\\
 \vdots\\
 \frac{\partial f_m}{\partial x}(x)^T \cdot h\\
 \end{pmatrix} + o(h)
-$$ 
+$$
 
-Now, let's define the \textbf{Jacobian} matrix as 
+Now, let's define the \textbf{Jacobian} matrix as
 \marginnote{The \textbf{Jacobian} matrix has dimensions $ m  \times n $ and is a generalization of the gradient}
 $$ J(x) := \begin{pmatrix}
 \frac{\partial f_1}{\partial x}(x)^T\\
 \vdots\\
 \frac{\partial f_m}{\partial x}(x)^T\\
-\end{pmatrix} = 
+\end{pmatrix} =
 \begin{pmatrix}
 \frac{\partial f_1}{\partial x_1}(x) \ldots \frac{\partial f_1}{\partial x_n}(x)\\
 \ddots \\
 \frac{\partial f_m}{\partial x_1}(x) \ldots \frac{\partial f_m}{\partial x_n}(x)\\
 \end{pmatrix}
-$$ 
+$$
 
 
-Then, we have that 
+Then, we have that
 
 \begin{align*}
 f \begin{pmatrix}
@@ -419,7 +417,7 @@ x_n + h_n
 x_1\\
 \vdots\\
 x_n
-\end{pmatrix} + 
+\end{pmatrix} +
 \begin{pmatrix}
 \frac{\partial f_1}{\partial x_1}(x) \ldots \frac{\partial f_1}{\partial x_n}(x)\\
 \ddots \\
@@ -440,12 +438,12 @@ $ J(x) = \nabla_x f^T $
 
 Let's take our first function $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that $ f(\begin{pmatrix}
  x_1 \\ x_2
- \end{pmatrix}) = 3x_1 + x_2^2 $. Then, the Jacobian of $ f $ is 
- 
+ \end{pmatrix}) = 3x_1 + x_2^2 $. Then, the Jacobian of $ f $ is
+
 \begin{align*}
 \begin{pmatrix}
 \frac{\partial f}{\partial x_2}(x) & \frac{\partial f}{\partial x_2}(x)
-\end{pmatrix} &= 
+\end{pmatrix} &=
 \begin{pmatrix}
 3 & 2x_2
 \end{pmatrix}\\
@@ -453,31 +451,31 @@ Let's take our first function $ f : \mathbb{R}^2 \mapsto \mathbb{R} $ such that 
 3\\2x_2
 \end{pmatrix}^T\\
 &= \nabla_f (x)^T
-\end{align*} 
+\end{align*}
 
 \textbf{Example 2 : $ g : \mathbb{R}^3 \mapsto \mathbb{R}^2 $}
  \label{example:jac2}
-Let's define 
+Let's define
 
 \begin{align*}
 g (\begin{pmatrix}
 y_1\\y_2\\y_3
-\end{pmatrix}) 
+\end{pmatrix})
 =\begin{pmatrix}
 y_1 + 2y_2 + 3y_3\\ y_1y_2y_3
 \end{pmatrix}
 \end{align*}
 
 
-Then, the Jacobian of $ g $ is 
+Then, the Jacobian of $ g $ is
 
 \begin{align*}
-J_g(y) &= 
+J_g(y) &=
 \begin{pmatrix}
 \frac{\partial (y_1 + 2y_2 + 3y_3)}{\partial y}(y)^T\\
 \frac{\partial (y_1y_2y_3)}{\partial y}(y)^T\\
 \end{pmatrix}\\
-&= 
+&=
 \begin{pmatrix}
 \frac{\partial (y_1 + 2y_2 + 3y_3)}{\partial y_1}(y) & \frac{\partial (y_1 + 2y_2 + 3y_3)}{\partial y_2}(y) & \frac{\partial (y_1 + 2y_2 + 3y_3)}{\partial y_3}(y)\\
 \frac{\partial (y_1y_2y_3)}{\partial y_1}(y) & \frac{\partial (y_1y_2y_3)}{\partial y_2}(y) & \frac{\partial (y_1y_2y_3)}{\partial y_3}(y)\\
@@ -494,11 +492,11 @@ y_2y_3 &y_1y_3 & y_1y_2
 
 \section{Generalization to $ f : \mathbb{R}^{n \times p} \mapsto \mathbb{R} $}
 
-If a function takes as input a matrix $ A \in \mathbb{R}^{n \times p} $, we can transform this matrix into a vector $ a \in \mathbb{R}^{np} $, such that 
+If a function takes as input a matrix $ A \in \mathbb{R}^{n \times p} $, we can transform this matrix into a vector $ a \in \mathbb{R}^{np} $, such that
 
 $$ A[i, j] = a[i + nj] $$
 
-Then, we end up with a function $ \tilde{f} : \mathbb{R}^{np} \mapsto \mathbb{R} $. We can apply the results from \ref{sec:summary} and we obtain for $ x, h \in \mathbb{R}^{np} $ corresponding to $ X, h \in \mathbb{R}^{n \times p} $, 
+Then, we end up with a function $ \tilde{f} : \mathbb{R}^{np} \mapsto \mathbb{R} $. We can apply the results from \ref{sec:summary} and we obtain for $ x, h \in \mathbb{R}^{np} $ corresponding to $ X, h \in \mathbb{R}^{n \times p} $,
 
 \begin{align*}
 \tilde{f}(x + h) &= f(x) + \langle \nabla_x f | h \rangle + o(h) \\
@@ -506,7 +504,7 @@ Then, we end up with a function $ \tilde{f} : \mathbb{R}^{np} \mapsto \mathbb{R}
 
 where $ \nabla_x f = \begin{pmatrix}
 \frac{\partial f}{\partial x_1}(x) \\ \vdots \\ \frac{\partial f}{\partial x_{np}(x)}
-\end{pmatrix} $. 
+\end{pmatrix} $.
 
 Now, we would like to give some meaning to the following equation
 
@@ -561,7 +559,7 @@ Where $ \circ $ is the composition operator. Here, $ \ud_{g(x)} f $ and $ \ud_x 
 
 \marginnote{The \textbf{chain-rule} is just writing the resulting \textbf{jacobian} as a dot product of \textbf{jacobians}. Order of the dot product is very important!}
 
-$$J_h(x) = J_f(g(x)) \cdot J_g(x) $$ 
+$$J_h(x) = J_f(g(x)) \cdot J_g(x) $$
 
 where $ \cdot $ is the dot-product. This dot-product between two matrices can also be written component-wise:
 
@@ -571,7 +569,7 @@ $$ J_h(x)_{ij} = \sum_{k=1}^n J_f (g(x))_{ik} \cdot J_g(x)_{kj}$$
 
 Let's keep our example function $ f : (\begin{pmatrix}
 x_1\\x_2
-\end{pmatrix}) \mapsto 3x_1 + x_2^2 $ and our function  
+\end{pmatrix}) \mapsto 3x_1 + x_2^2 $ and our function
 $ g : (\begin{pmatrix}
 y_1\\y_2\\y_3
 \end{pmatrix}) = \begin{pmatrix}
@@ -597,19 +595,19 @@ We can compute the three components of the gradient of $ h $ with the partial de
 \frac{\partial h}{\partial y_3}(y) &= 9 + 2y_3y_1^2y_2^2\\
 \end{align*}
 
-And then our gradient is 
+And then our gradient is
 
 $$ \nabla_y h = \begin{pmatrix}
 3 + 2y_1y_2^2y_3^2 \\ 6 + 2y_2y_1^2y_3^2 \\ 9 + 2y_3y_1^2y_2^2
 \end{pmatrix}  $$
 
-In this process, we did not use our previous calculation, and that's a shame. Let's use the chain-rule to make use of it. With examples \ref{example:gradient} and \ref{example:jac1}, we had 
+In this process, we did not use our previous calculation, and that's a shame. Let's use the chain-rule to make use of it. With examples \ref{example:gradient} and \ref{example:jac1}, we had
 
 \marginnote{For a function $f : \mathbb{R}^n \mapsto \mathbb{R} $, the Jacobian is the transpose of the gradient\\
 $$\nabla_x f^T = J_f(x)$$ }
 
 \begin{align*}
- J_f(x) &= \nabla_x f^T\\ 
+ J_f(x) &= \nabla_x f^T\\
  &= \begin{pmatrix}
 3  & 2 x_2
 \end{pmatrix}
@@ -618,14 +616,14 @@ $$\nabla_x f^T = J_f(x)$$ }
 We also need the jacobian of $ g $, which we computed in \ref{example:jac2}
 
 \begin{align*}
-J_g(y) &= 
+J_g(y) &=
 \begin{pmatrix}
 1 & 2 & 3\\
 y_2y_3 &y_1y_3 & y_1y_2
 \end{pmatrix}
 \end{align*}
 
-Applying the chain rule, we obtain that the \textbf{jacobian} of $ h $ is the product $ J_f \cdot J_g $ (\textbf{in this order}). Recall that for a function $ \mathbb{R}^n \mapsto \mathbb{R} $, the jacobian is formally the transpose of the gradient. Then, 
+Applying the chain rule, we obtain that the \textbf{jacobian} of $ h $ is the product $ J_f \cdot J_g $ (\textbf{in this order}). Recall that for a function $ \mathbb{R}^n \mapsto \mathbb{R} $, the jacobian is formally the transpose of the gradient. Then,
 
 
 \begin{align*}
@@ -633,12 +631,12 @@ J_h (y) &= J_f(g(y))\cdot J_g(y)\\
 &= \nabla_{g(y)}^T f \cdot J_g(y)\\
 &= \begin{pmatrix}
 3 & 2y_1y_2y_3
-\end{pmatrix}\cdot 
+\end{pmatrix}\cdot
 \begin{pmatrix}
 1 & 2 & 3\\
 y_2y_3 &y_1y_3 & y_1y_2
 \end{pmatrix}\\
-&= 
+&=
 \begin{pmatrix}
 3 + 2y_1 y_2^2 y_3^2 & 6 + 2y_2y_1^2y_3^2 & 9 + 2y_3y_1^2y_2^2
 \end{pmatrix}
@@ -648,15 +646,15 @@ and taking the transpose we find the same gradient that we computed before!
 
 \textbf{Important remark}
 \begin{itemize}
-\item The gradient is only defined for function with values in $ \mathbb{R} $. 
+\item The gradient is only defined for function with values in $ \mathbb{R} $.
 \item Note that the chain rule gives us a way to compute the \textbf{Jacobian} and \underline{not the \textbf{gradient}}. However, we showed that in the case of a function $ f: \mathbb{R}^n \mapsto \mathbb{R} $, the \textbf{jacobian} and the \textbf{gradient} are directly identifiable, because $ \nabla_x J^T = J (x) $. Thus, if we want to compute the gradient of a function by using the chain-rule, the best way to do it is to compute the Jacobian.
 \item As the gradient must have the same shape as the variable against which we derive, and
 \begin{itemize}
 \item we know that the Jacobian is the transpose of the gradient
 \item and the Jacobian is the dot product of Jacobians
-\end{itemize} 
+\end{itemize}
 an efficient way of computing the gradient is to find the ordering of jacobian (or the transpose of the jacobian) that yield correct shapes!
-\item the notation $ \frac{\partial \cdot }{\partial \cdot} $ is often ambiguous and can refer to either the gradient or the Jacobian. 
+\item the notation $ \frac{\partial \cdot }{\partial \cdot} $ is often ambiguous and can refer to either the gradient or the Jacobian.
 \end{itemize}
 
 %\section{Examples}
