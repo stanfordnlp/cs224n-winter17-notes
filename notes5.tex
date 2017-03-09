@@ -1,8 +1,8 @@
 \documentclass{tufte-handout}
 
-\title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
-
-\author[Milad Mohammadi, Rohit Mundra, Lisa Wang, Richard Socher]{Lecture Notes: Part V\thanks{Authors: Milad Mohammadi, Rohit Mundra, Richard Socher, Lisa Wang}}
+\title{CS224n: Natural Language Processing with Deep Learning
+       \thanks{Course Instructors: Christopher Manning, Richard Socher} \\
+       \Large Lecture Notes: Part V\thanks{Authors: Milad Mohammadi, Rohit Mundra, Richard Socher, Lisa Wang}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -59,7 +59,7 @@ Language models compute the probability of occurrence of a number of words in a 
 	\label{eqn:nat_model}
 \end{equation}
 
-Equation~\ref{eqn:nat_model} is especially useful for speech and translation systems when determining whether a word sequence is an accurate translation of an input sentence. In existing language translation systems, for each phrase / sentence translation, the software generates a number of alternative word sequences (e.g. \textit{\{I have, I had, I has, me have, me had\}}) and scores them to identify the most likely translation sequence. 
+Equation~\ref{eqn:nat_model} is especially useful for speech and translation systems when determining whether a word sequence is an accurate translation of an input sentence. In existing language translation systems, for each phrase / sentence translation, the software generates a number of alternative word sequences (e.g. \textit{\{I have, I had, I has, me have, me had\}}) and scores them to identify the most likely translation sequence.
 
 In machine translation, the model chooses the best word ordering for an input phrase by assigning a \textit{goodness} score to each output word sequence alternative. To do so, the model may choose between different word ordering or word choice alternatives. It would achieve this objective by running all word sequence candidates through a probability function that assigns each a score. The sequence with the highest score is the output of the translation. For example, the machine would give a higher score to \textit{"the cat is small"} compared to \textit{"small the is cat"}, and a higher score to \textit{"walking home after school"} compare do \textit{"walking house after school"}. To compute these probabilities, the count of each n-gram would be compared against the frequency of each word. For instance, if the model takes bi-grams, the frequency of each bi-gram, calculated via combining a word with its previous word, would be divided by the frequency of the corresponding uni-gram. Equations~\ref{eqn:bigram} and \ref{eqn:trigram} show this relationship for bigram and trigram models.
 
@@ -72,7 +72,7 @@ In machine translation, the model chooses the best word ordering for an input ph
 	\label{eqn:trigram}
 \end{equation}
 
-The relationship in Equation~\ref{eqn:trigram} focuses on making predictions based on a fixed window of context (i.e. the $n$ previous words) used to predict the next word. In some cases, the window of past consecutive $n$ words may not be sufficient to capture the context. For instance, consider a case where an article discusses the history of Spain and France and somewhere later in the text, it reads "The two countries went on a battle"; clearly the information presented in this sentence alone is not sufficient to identify the name of the two countries. Bengio et al. introduced the first large-scale deep learning for natural language processing model that enables capturing this type of context via \textit{learning a distributed representation of words}; Figure~\ref{fig:bengio_03} shows the corresponding neural network architecture. In this model, input word vectors are used by both the hidden layer and the output layer. 
+The relationship in Equation~\ref{eqn:trigram} focuses on making predictions based on a fixed window of context (i.e. the $n$ previous words) used to predict the next word. In some cases, the window of past consecutive $n$ words may not be sufficient to capture the context. For instance, consider a case where an article discusses the history of Spain and France and somewhere later in the text, it reads "The two countries went on a battle"; clearly the information presented in this sentence alone is not sufficient to identify the name of the two countries. Bengio et al. introduced the first large-scale deep learning for natural language processing model that enables capturing this type of context via \textit{learning a distributed representation of words}; Figure~\ref{fig:bengio_03} shows the corresponding neural network architecture. In this model, input word vectors are used by both the hidden layer and the output layer.
 Equation~\ref{eqn:bengio_eqn} shows the parameters of the $\operatorname{softmax()}$ function consisting of the standard $\operatorname{tanh()}$ function (i.e. the hidden layer) as well as the linear function, $W^{(3)}x+b^{(3)}$, that captures all the previous $n$ input word vectors.
 
 \begin{marginfigure}
@@ -91,7 +91,7 @@ Note that the weight matrix $W^{(1)}$ is applied to the word vectors (solid gree
 In all conventional language models, the memory requirements of the system grows exponentially with the window size $n$ making it nearly impossible to model large word windows without running out of memory.
 
 \section{Recurrent Neural Networks (RNN)}
-Unlike the conventional translation models, where only a finite window of previous words would be considered for conditioning the language model, Recurrent Neural Networks (RNN) are capable of conditioning the model on \textit{all} previous words in the corpus. 
+Unlike the conventional translation models, where only a finite window of previous words would be considered for conditioning the language model, Recurrent Neural Networks (RNN) are capable of conditioning the model on \textit{all} previous words in the corpus.
 
 Figure~\ref{fig:rnn} introduces the RNN architecture where rectangular box is a hidden layer at a time-step, $t$. Each such layer holds a number of neurons, each of which performing a linear matrix operation on its inputs followed by a non-linear operation (e.g. $\operatorname{tanh()}$). At each time-step, the output of the previous step along with the next word vector in the document, $x_t$, are inputs to the hidden layer to produce a prediction output $\hat{y}$ and output features $h_t$ (Equations~\ref{eqn:h_t} and \ref{eqn:y}). The inputs and outputs of each single neuron are illustrated in Figure~\ref{fig:rnn_node}.
 \begin{equation}
@@ -116,7 +116,7 @@ Below are the details associated with each parameter in the network:
 	\item $x_1, ..., x_{t-1}, x_t, x_{t+1}, ... x_{T}$: the word vectors corresponding to a corpus with T words.
 	\item $h_t = \sigma(W^{(hh)} h_{t-1} + W^{(hx)} x_{t})$: the relationship to compute the hidden layer output features at each time-step $t$
 	\begin{itemize}
-		\item $x_{t} \in \mathbb{R}^{d}$: input word vector at time $t$. 
+		\item $x_{t} \in \mathbb{R}^{d}$: input word vector at time $t$.
 		\item $W^{hx} \in \mathbb{R}^{D_h \times d}$: weights matrix used to condition the input word vector, $x_t$
 		\item $W^{hh} \in \mathbb{R}^{D_h \times D_h}$: weights matrix used to condition the output of the previous time-step, $h_{t-1}$
 		\item $h_{t-1}  \in \mathbb{R}^{D_h}$: output of the non-linear function at the previous time-step, $t-1$. $h_0 \in \mathbb{R}^{D_h}$ is an initialization vector for the hidden layer at time-step $t = 0$.
@@ -155,6 +155,7 @@ Equation~\ref{eqn:perplexity} is called the \textit{perplexity} relationship; it
 The amount of memory required to run a layer of RNN is proportional to the number of words in the corpus. For instance, a sentence with k words would have k word vectors to be stored in memory. Also, the RNN must maintain two pairs of  $W, b$ matrices. While the size of W could be very large, it does not scale with the size of the corpus (unlike the traditional language models). For a RNN with 1000 recurrent layers, the matrix would be $1000 \times 1000$ regardless of the corpus size.
 
 Figure~\ref{fig:rnn_loop} is an alternative representation of RNNs used in some publications. It represents the RNN hidden layer as a loop.
+
 \begin{marginfigure}
 	\centering
 	\includegraphics[width=\linewidth]{rnn_loop.pdf}
@@ -189,13 +190,13 @@ Consider Equations~\ref{eqn:h_t} and \ref{eqn:y} at a time-step $t$; to compute 
 	\label{eqn:bp_rnn_error}
 \end{equation}
 
-The error for each time-step is computed through applying the chain rule differentiation to Equations~\ref{eqn:y} and \ref{eqn:h_t}; Equation~\ref{eqn:bp_rnn_chain} shows the corresponding differentiation. Notice $dh_t/dh_k$ refers to the partial derivative of $h_t$ with respect to \textit{all} previous $k$ time-steps. 
+The error for each time-step is computed through applying the chain rule differentiation to Equations~\ref{eqn:y} and \ref{eqn:h_t}; Equation~\ref{eqn:bp_rnn_chain} shows the corresponding differentiation. Notice $dh_t/dh_k$ refers to the partial derivative of $h_t$ with respect to \textit{all} previous $k$ time-steps.
 \begin{equation}
 	\dfrac{\partial E_t}{\partial W} = \sum_{k=1}^{t} \dfrac{\partial E_t}{\partial y_t} \dfrac{\partial y_t}{\partial h_t} \dfrac{\partial h_t}{\partial h_k} \dfrac{\partial h_k}{\partial W}
 	\label{eqn:bp_rnn_chain}
 \end{equation}
 
-Equation~\ref{eqn:bp_rnn_k} shows the relationship to compute each $dh_t/dh_k$; this is simply a chain rule differentiation over all hidden layers within the $[k, t]$ time interval. 
+Equation~\ref{eqn:bp_rnn_k} shows the relationship to compute each $dh_t/dh_k$; this is simply a chain rule differentiation over all hidden layers within the $[k, t]$ time interval.
 \begin{equation}
 	\dfrac{\partial h_t}{\partial h_k} = \prod_{j=k+1}^{t}\dfrac{\partial h_j}{\partial h_{j-1}} = \prod_{j=k+1}^{t}W^T \times diag [f'(j_{j-1})]
 	\label{eqn:bp_rnn_k}
@@ -203,7 +204,7 @@ Equation~\ref{eqn:bp_rnn_k} shows the relationship to compute each $dh_t/dh_k$; 
 
 Because $h \in \mathbb{R}^{D_n}$, each $\partial h_j/\partial h_{j-1}$ is the Jacobian matrix for $h$:
 \begin{equation}
-	\dfrac{\partial h_j}{\partial h_{j-1}} = {[\dfrac{\partial h_{j}}{\partial h_{j-1,1}} ...  \dfrac{\partial h_{j}}{\partial h_{j-1,D_n}}]} = 
+	\dfrac{\partial h_j}{\partial h_{j-1}} = {[\dfrac{\partial h_{j}}{\partial h_{j-1,1}} ...  \dfrac{\partial h_{j}}{\partial h_{j-1,D_n}}]} =
 	\begin{bmatrix}
 	\dfrac{\partial h_{j,1}}{\partial h_{j-1,1}} & . & . & . & \dfrac{\partial h_{j,1}}{\partial h_{j-1,D_n}} \\
 	. & . & & & . \\
@@ -240,7 +241,7 @@ During experimentation, once the gradient value grows extremely large, it causes
 To gain practical intuition about the vanishing gradient problem, you may visit the following \uline{\href{http://cs224d.stanford.edu/notebooks/vanishing_grad_example.html}{example website}}.
 
 \subsection{Solution to the Exploding \& Vanishing Gradients}
-Now that we gained intuition about the nature of the vanishing gradients problem and how it manifests itself in deep neural networks, let us focus on a simple and practical heuristic to solve these problems. 
+Now that we gained intuition about the nature of the vanishing gradients problem and how it manifests itself in deep neural networks, let us focus on a simple and practical heuristic to solve these problems.
 
 To solve the problem of exploding gradients, Thomas Mikolov first introduced a simple heuristic solution that \textit{clips} gradients to a small number whenever they explode. That is, whenever they reach a certain threshold, they are set back to a small number as shown in Algorithm~\ref{alg:clip}.
 
@@ -264,7 +265,7 @@ Figure~\ref{fig:clipping} visualizes the effect of gradient clipping. It shows t
 	\label{fig:clipping}
 \end{marginfigure}
 
-To solve the problem of vanishing gradients, we introduce two techniques. The first technique is that instead of initializing $W^{(hh)}$ randomly, start off from an identify matrix initialization. 
+To solve the problem of vanishing gradients, we introduce two techniques. The first technique is that instead of initializing $W^{(hh)}$ randomly, start off from an identify matrix initialization.
 %TODO the initialization idea requires more writing
 
 The second technique is to use the Rectified Linear Units (ReLU) instead of the sigmoid function. The derivative for the ReLU is either 0 or 1. This way, gradients would flow through the neurons whose derivative is 1 without getting attenuated while propagating back through time-steps.
@@ -293,7 +294,7 @@ So far, we have focused on RNNs that look into the past words to predict the nex
 	\label{eqn:birnn_classifier}
 \end{equation}
 
-Figure~\ref{fig:deepbirnn} shows a multi-layer bi-directional RNN where each lower layer feeds the next layer. As shown in this figure, in this network architecture, at time-step $t$ each intermediate neuron receives one set of parameters from the previous time-step (in the same RNN layer), and two sets of parameters from the previous RNN hidden layer; one input comes from the left-to-right RNN and the other from the right-to-left RNN.  
+Figure~\ref{fig:deepbirnn} shows a multi-layer bi-directional RNN where each lower layer feeds the next layer. As shown in this figure, in this network architecture, at time-step $t$ each intermediate neuron receives one set of parameters from the previous time-step (in the same RNN layer), and two sets of parameters from the previous RNN hidden layer; one input comes from the left-to-right RNN and the other from the right-to-left RNN.
 
 To construct a Deep RNN with $L$ layers, the above relationships are modified to the relationships in Equations~\ref{eqn:d_rnn_right} and \ref{eqn:d_rnn_left} where the input to each intermediate neuron at level $i$ is the output of the RNN at layer $i-1$ at the same time-step, $t$. The output, $\hat{y}$, at each time-step is the result of propagating input parameters through all hidden layers (Equation~\ref{eqn:d_birnn_classifier}).
 
@@ -411,7 +412,7 @@ f_{t} &= \sigma(W^{(f)}x_{t} + U^{(f)}h_{t-1})&~\text{(Forget gate)}\\
 o_{t} &= \sigma(W^{(o)}x_{t} + U^{(o)}h_{t-1})&~\text{(Output/Exposure gate)}\\
 \tilde{c}_{t} &= \operatorname{tanh}(W^{(c)}x_{t} + U^{(c)}h_{t-1})&~\text{(New memory cell)}\\
 c_{t} &= f_{t} \circ c_{t-1} + i_{t} \circ \tilde{c}_{t}&~\text{(Final memory cell)}\\
-h_{t} &= o_{t} \circ \operatorname{tanh}(c_{t}) 
+h_{t} &= o_{t} \circ \operatorname{tanh}(c_{t})
 \end{align*}
 
 \begin{figure*}%

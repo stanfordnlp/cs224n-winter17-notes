@@ -1,8 +1,8 @@
 \documentclass{tufte-handout}
 
-\title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
-
-\author[Zhedi Liu]{Lecture Notes:  TensorFlow\thanks{Authors: Zhedi Liu, Jon Gauthier, Bharath Ramsundar, Chip Huyen}}
+\title{CS224n: Natural Language Processing with Deep Learning
+       \thanks{Course Instructors: Christopher Manning, Richard Socher} \\
+       \Large Lecture Notes:  TensorFlow\thanks{Authors: Zhedi Liu, Jon Gauthier, Bharath Ramsundar, Chip Huyen}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -66,7 +66,7 @@ Nodes in TensorFlow's data flow graph represent mathematical operations, while t
 
 \section{Concepts}
 \subsection{Variables, Placeholders, Mathematical Operations}
-Let's use $$h = ReLU(Wx + b)$$ where $ReLU$ (Rectified Linear Unit) is defined as $f(x) = max(0, x)$ as an example to take a closer look at TensorFlow's data flow graph, shown in Figure~\ref{fig:tensorFlow}. There are three types of nodes in a flow graph: variables, placeholders and mathematical operations. 
+Let's use $$h = ReLU(Wx + b)$$ where $ReLU$ (Rectified Linear Unit) is defined as $f(x) = max(0, x)$ as an example to take a closer look at TensorFlow's data flow graph, shown in Figure~\ref{fig:tensorFlow}. There are three types of nodes in a flow graph: variables, placeholders and mathematical operations.
 
 \begin{marginfigure}
 	\centering
@@ -75,7 +75,7 @@ Let's use $$h = ReLU(Wx + b)$$ where $ReLU$ (Rectified Linear Unit) is defined a
 	\label{fig:tensorFlow}
 \end{marginfigure}
 
-Variables are stateful nodes that maintain state across executions of the graph. By stateful, we mean that variables retain their current values over multiple executions, and it's easy to restore those saved values. Variables can be saved to disk during and after training. Typically, variables are parameters in a neural network. In our example, weights $W$ and bias $b$ are variables. 
+Variables are stateful nodes that maintain state across executions of the graph. By stateful, we mean that variables retain their current values over multiple executions, and it's easy to restore those saved values. Variables can be saved to disk during and after training. Typically, variables are parameters in a neural network. In our example, weights $W$ and bias $b$ are variables.
 
 Placeholders are nodes whose values are fed in at execution time. The rationale behind having placeholders is that we want to be able to build flow graphs without having to load external data, as we only want to pass in them at run time. Placeholders, unlike variables, require initialization. In order to initialize a placeholder, type and shape of data have to be passed in as arguments. Input data and labels are some examples that need to be initialized as placeholders. In our example, placeholder is $x$. See the code snippet below for initializing an input placeholder that has type tf.float32 and shape (batch\_size, n\_features), and a labels placeholder that has type tf.int32 and shape (batch\_size, n\_classes).
 
@@ -90,7 +90,7 @@ labels_placeholder = tf.placeholder(tf.int32, s
 
 Mathematical operations, as the name suggests, represent mathematical operations in a flow graph. In our example, \texttt{MatMul} (multiply two matrix values), \texttt{Add} (add element-wise with broadcasting) and \texttt{ReLU} (activate with element-wise rectified linear function) are mathematical operations.
 
-Now we are ready to see our flow graph in code. Let's assume our input $x$ has shape ($N$, $Dx$), $W$ has shape ($Dx$, $N$) and type tf.float32, $b$ has shape ($N$, 1) and we will initialize $W\sim \textrm{Uniform}(-1, 1)$ and $b = \boldmath{0}$. Then the code snippet below shows us how to build our flow graph for $h = ReLU(Wx + b)$.  
+Now we are ready to see our flow graph in code. Let's assume our input $x$ has shape ($N$, $Dx$), $W$ has shape ($Dx$, $N$) and type tf.float32, $b$ has shape ($N$, 1) and we will initialize $W\sim \textrm{Uniform}(-1, 1)$ and $b = \boldmath{0}$. Then the code snippet below shows us how to build our flow graph for $h = ReLU(Wx + b)$.
 
 \begin{python}
 ## Example code snippet
@@ -103,12 +103,12 @@ h = tf.nn.relu(tf.matmul(x, W) + b)
 
 \end{python}
 
-The key thing to remember about symbolic programming language is that, up to what what we have written here, no data is actually being computed. $x$ is just a placeholder for our input data. A flow graph merely defines a function. We cannot do \texttt{print(h)} and gets its value as it only represents a node in the graph. 
+The key thing to remember about symbolic programming language is that, up to what what we have written here, no data is actually being computed. $x$ is just a placeholder for our input data. A flow graph merely defines a function. We cannot do \texttt{print(h)} and gets its value as it only represents a node in the graph.
 
 \subsection{Fetch, Fetch}
 Now that we've defined a graph, the next steps are to deploy this graph with a session and run the session to get our outputs. A session is an environment that supports the execution of all operations to a particular execution context (e.g. CPU, GPU). A session can be easily built by doing \texttt{sess = tf.Session()}. In order for a session to run, two arguments have to be fed: fetches and feeds. We use feeds and fetches to get data into and out of arbitrary operations.
 
-Fetches represent a list of graph nodes and return the outputs of these nodes. We could fetch a single node or multiple tensors. See the code snippet below for an example of fetching two tensors: \texttt{mul} and \texttt{intermed}. 
+Fetches represent a list of graph nodes and return the outputs of these nodes. We could fetch a single node or multiple tensors. See the code snippet below for an example of fetching two tensors: \texttt{mul} and \texttt{intermed}.
 
 \begin{python}
 ## Example code snippet
@@ -129,7 +129,7 @@ with tf.Session() as sess:
 
 \end{python}
 
-A feed, supplied as an argument to a \texttt{run()} call, temporarily replaces the output of an operation with a tensor value. The feed is only used for the \texttt{run} call to which it is passed. Essentially, feeds are dictionaries mapping placeholders to their values. Nodes that depend on placeholders cannot run unless their values are fed. See the code snippet below for an example of feeding a \texttt{feed\_dict}. 
+A feed, supplied as an argument to a \texttt{run()} call, temporarily replaces the output of an operation with a tensor value. The feed is only used for the \texttt{run} call to which it is passed. Essentially, feeds are dictionaries mapping placeholders to their values. Nodes that depend on placeholders cannot run unless their values are fed. See the code snippet below for an example of feeding a \texttt{feed\_dict}.
 
 \begin{python}
 ## Example code snippet
@@ -163,7 +163,7 @@ h = tf.nn.relu(tf.matmul(x, W) + b)
 
 sess = tf.Session()
 sess.run(tf.initialize_all_variables())
-# {x: np.random.random(100, 784)} is a feed 
+# {x: np.random.random(100, 784)} is a feed
 # that assigns np.random.random(100, 784) to placeholder x
 sess.run(h, {x: np.random.random(100, 784)})
 
@@ -227,9 +227,9 @@ One last important concept is variable sharing. When building complex models, we
 
 Imagine we are building a neural nets with two layers, if we use \texttt{tf.Variable}, we would have two sets of weights and two sets of biases. Let's assume that these variables are initialized in \texttt{define\_variables()}. The problem arises when we want to use this model for two tasks that share the same parameters. We would have to call \texttt{define\_variables(inputs)} twice, resulting in two sets of variables, 4 variables in each one, for a total of 8 variables. A common try to share variables is to create them in a separate piece of code and pass them to functions that use them, say by using a dictionary. I.e. the \texttt{define\_variables} now takes two arguments, \texttt{inputs} and \texttt{variables\_dict}. While convenient, creating a \texttt{variables\_dict}, outside of the code, breaks encapsulation: 1) the code that builds the graph must document the names, types, and shapes of variables to create, and 2) When the code changes, the callers may have to create more, or less, or different variables. One way to address the problem is to use classes to create a model, where the classes take care of managing the variables they need. For a lighter solution, not involving classes, TensorFlow provides a Variable Scope mechanism that allows to easily share named variables while constructing a graph.
 
-Variable Scope mechanism in TensorFlow consists of two main functions: \texttt{tf.get\_variable(<name>, <shape>, <initializer>)} creates or returns a variable with a given name instead of a direct call to \texttt{tf.Variable}; \texttt{tf.variable\_scope(<scope\_name>)} manages namespaces for names passed to \texttt{tf.get\_variable()}. \texttt{tf.get\_variable} does one of two things depending on the scope it is called in. Let's set \texttt{v = tf.get\_variable(name, shape, dtype, initializer)}. 
+Variable Scope mechanism in TensorFlow consists of two main functions: \texttt{tf.get\_variable(<name>, <shape>, <initializer>)} creates or returns a variable with a given name instead of a direct call to \texttt{tf.Variable}; \texttt{tf.variable\_scope(<scope\_name>)} manages namespaces for names passed to \texttt{tf.get\_variable()}. \texttt{tf.get\_variable} does one of two things depending on the scope it is called in. Let's set \texttt{v = tf.get\_variable(name, shape, dtype, initializer)}.
 
-Case 1: the scope is set for creating new variables, i.e. \texttt{tf.get\_variable\_scope(name, reuse=False)}.In this case, $v$ will be a newly created \texttt{tf.Variable} with the provided shape and data type. The full name of the created variable will be set to the current variable scope name + the provided name and a check will be performed to ensure that no variable with this full name exists yet. If a variable with this full name already exists, the function will raise a \texttt{ValueError}. If a new variable is created, it will be initialized to the value \texttt{initializer(shape)}. For example, 
+Case 1: the scope is set for creating new variables, i.e. \texttt{tf.get\_variable\_scope(name, reuse=False)}.In this case, $v$ will be a newly created \texttt{tf.Variable} with the provided shape and data type. The full name of the created variable will be set to the current variable scope name + the provided name and a check will be performed to ensure that no variable with this full name exists yet. If a variable with this full name already exists, the function will raise a \texttt{ValueError}. If a new variable is created, it will be initialized to the value \texttt{initializer(shape)}. For example,
 
 \begin{python}
 ## Example code snippet
