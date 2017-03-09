@@ -7,9 +7,8 @@
 
 
 
-\title{CS 224n: Deep Learning for NLP\thanks{Course Instructor: Richard Socher}}
-
-\author[Francois Chaubard, Richard Socher]{Lecture Notes: Part VII \thanks{Author: Francois Chaubard, Richard Socher}}
+\title{CS224n: Deep Learning for NLP\thanks{Course Instructor: Richard Socher} \\
+       \Large Lecture Notes: Part VII \thanks{Authors: Francois Chaubard, Richard Socher}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -69,9 +68,9 @@ This set of notes discusses and describes the many variants on the RNN (Recursiv
   \label{fig:img1}
 \end{marginfigure}
 
-In these notes, we introduce and discuss a new type of model that is indeed a superset of the previously discussed Recurrent Neural Network. Recursive Neural Networks (RNNs) are perfect for settings that have nested hierarchy and an intrinsic recursive structure. Well if we think about a sentence, doesn't this have such a structure? Take the sentence ''A small crowd quietly enters the historical church''. First, we break apart the sentence into its respective Noun Phrase, Verb Phrase, ''A small crowd'' and ''quietly enters the historical church'', respectively. But there is a noun phrase, verb phrase within that verb phrase right? ''quietly enters'' and ''historical church''. etc, etc. Seems pretty recursive to me. 
+In these notes, we introduce and discuss a new type of model that is indeed a superset of the previously discussed Recurrent Neural Network. Recursive Neural Networks (RNNs) are perfect for settings that have nested hierarchy and an intrinsic recursive structure. Well if we think about a sentence, doesn't this have such a structure? Take the sentence ''A small crowd quietly enters the historical church''. First, we break apart the sentence into its respective Noun Phrase, Verb Phrase, ''A small crowd'' and ''quietly enters the historical church'', respectively. But there is a noun phrase, verb phrase within that verb phrase right? ''quietly enters'' and ''historical church''. etc, etc. Seems pretty recursive to me.
 
-The syntactic rules of language are highly recursive. So we take advantage of that recursive structure with a model that respects it! Another added benefit of modeling sentences with RNN's is that we can now input sentences of arbitrary length, which was a huge head scratcher for using Neural Nets in NLP, with very clever tricks to make the input vector of the sentence to be of equal size despite the length of the sentences not being equal. (see Bengio et al., 2003; Henderson, 2003; Collobert \& Weston, 2008) 
+The syntactic rules of language are highly recursive. So we take advantage of that recursive structure with a model that respects it! Another added benefit of modeling sentences with RNN's is that we can now input sentences of arbitrary length, which was a huge head scratcher for using Neural Nets in NLP, with very clever tricks to make the input vector of the sentence to be of equal size despite the length of the sentences not being equal. (see Bengio et al., 2003; Henderson, 2003; Collobert \& Weston, 2008)
 
 
 
@@ -85,7 +84,7 @@ Let's imagine our task is to take a sentence and represent it as a vector in the
 
 We need a way to take a sentence and its respective words vectors, and derive what the embedded vector should be. Now lets first ask a very debated question. Is it naive to believe that the vector space that we used to represent all words, is sufficiently expressive to also be able to represent all sentences of any length? While this may be unintuitive, the performance of these models suggest that this is actually a reasonable thing to do.
 
-Let's first discuss the difference between semantic and grammatical understanding of a sentence. Semantic analysis is an understanding of the meaning of a sentence, being able to represent the phrase as a vector in a structured semantic space, where similar sentences are very nearby, and unrelated sentences are very far away. The grammatical understanding is one where we have identified the underlying grammatical structure of the sentence, which part of the sentence depends on which other part, what words are modifying what other words, etc. The output of such an understanding is usually represented as a parse tree as displayed in Figure 2. 
+Let's first discuss the difference between semantic and grammatical understanding of a sentence. Semantic analysis is an understanding of the meaning of a sentence, being able to represent the phrase as a vector in a structured semantic space, where similar sentences are very nearby, and unrelated sentences are very far away. The grammatical understanding is one where we have identified the underlying grammatical structure of the sentence, which part of the sentence depends on which other part, what words are modifying what other words, etc. The output of such an understanding is usually represented as a parse tree as displayed in Figure 2.
 
 Now for the million dollar question. If we want to know the semantic representation, is it an advantage, nay, required, to have a grammatical understanding? Well some might disagree but for now we will treat this semantic composition task the following way. First, we need to understand words. Then, we need to know the way words are put together, Then, finally, we can get to a meaning of a phrase or sentence by leveraging these two previous concepts.
 
@@ -102,17 +101,17 @@ So lets begin with our first model built on this principle. Let's imagine we wer
 \end{marginfigure}
 
 Lets walk through the model displayed in Figure 3 above. We first take a sentence parse tree and the sentence word vectors and begin to walk up the tree. The lowest node in the graph is Node 3, so we concatenate $L_{29}$ and $L_{430}$ to form a vector $\in \mathbb{R}^{2d}$ and feed it into our network to compute:
-\begin{equation} 
-h^{(1)} = tanh(W^{(1)} \left[ \begin{array}{c} L_{29} \\ L_{430} \end{array} \right] + b^{(1)}) 
-\end{equation} 
-Since $ W^{(1)} \in \mathbb{R}^{d \times 2d}$ and $ b^{(1)} \in \mathbb{R}^{d}$, $ h^{(1)} \in \mathbb{R}^{d}$. We can now think of $h^{(1)}$ as a point in the same word vector space for the bigram ''this assignment'', in which we did not need to learn this representation separately, but rather derived it from its constituting word vectors. 
+\begin{equation}
+h^{(1)} = tanh(W^{(1)} \left[ \begin{array}{c} L_{29} \\ L_{430} \end{array} \right] + b^{(1)})
+\end{equation}
+Since $ W^{(1)} \in \mathbb{R}^{d \times 2d}$ and $ b^{(1)} \in \mathbb{R}^{d}$, $ h^{(1)} \in \mathbb{R}^{d}$. We can now think of $h^{(1)}$ as a point in the same word vector space for the bigram ''this assignment'', in which we did not need to learn this representation separately, but rather derived it from its constituting word vectors.
 
-We now take $h^{(1)}$ and put it through a softmax layer to get a score over a set of sentiment classes, a discrete set of known classes that represent some meaning. In the case of positive/negative sentiment analysis, we would have 5 classes, class 0 implies strongly negative, class 1 implies negative, class 2 is neutral, class 3 is positive, and finally class 4 is strongly positive. 
+We now take $h^{(1)}$ and put it through a softmax layer to get a score over a set of sentiment classes, a discrete set of known classes that represent some meaning. In the case of positive/negative sentiment analysis, we would have 5 classes, class 0 implies strongly negative, class 1 implies negative, class 2 is neutral, class 3 is positive, and finally class 4 is strongly positive.
 
-Now we do the same thing with the ''I'' and ''love'' to produce the vector $h^{(1)}$ for the phrase ''I love''. Again, we compute a score over the semantic classes again for that phrase. Finally, for the most interesting step, we need to merge the two phrases ''I love'' and ''this assignment''. Here we are concatenating word phrases, rather than word vectors! We do this in the same manner, concatenating the two $h^{(1)}$ vectors and compute 
-\begin{equation} 
- h^{(1)} = \text{tanh}(W^{(1)}  \left[ \begin{array}{c} h^{(1)}_{Left} \\ h^{(1)}_{Right} \end{array} \right] + b^{(1)}) 
-\end{equation} 
+Now we do the same thing with the ''I'' and ''love'' to produce the vector $h^{(1)}$ for the phrase ''I love''. Again, we compute a score over the semantic classes again for that phrase. Finally, for the most interesting step, we need to merge the two phrases ''I love'' and ''this assignment''. Here we are concatenating word phrases, rather than word vectors! We do this in the same manner, concatenating the two $h^{(1)}$ vectors and compute
+\begin{equation}
+ h^{(1)} = \text{tanh}(W^{(1)}  \left[ \begin{array}{c} h^{(1)}_{Left} \\ h^{(1)}_{Right} \end{array} \right] + b^{(1)})
+\end{equation}
 
 Now we have a vector in the word vector space that represents the full sentence ''I love this assignment''. Furthermore, we can put this $h^{(1)}$ through the same softmax layer as before, and compute sentiment probabilities for the full sentence. Of course the model will only do this reliably once trained.
 %but that left for you to do in PSet3. :)
@@ -128,11 +127,11 @@ Now lets take a step back. First, is it naive to think we can use the same matri
   \label{fig:img4}
 \end{marginfigure}
 
-As we discussed in the criticisms of the previous section, using the same W to bring together a Noun Phrase and Verb Phrase and to bring together a Prepositional Phrase and another word vector seems intuitively wrong. And maybe we are bluntly merging all of these functionalities into too weak of a model. 
+As we discussed in the criticisms of the previous section, using the same W to bring together a Noun Phrase and Verb Phrase and to bring together a Prepositional Phrase and another word vector seems intuitively wrong. And maybe we are bluntly merging all of these functionalities into too weak of a model.
 
-What we can do to remedy this shortcoming is to ''syntactically untie'' the weights of these different tasks. By this we mean, there is no reason to expect the optimal W for one category of inputs to be at all related to the optimal W for another category of inputs. So we let these W's be different and relax this constraint. While this for sure increases our weight matrices to learn, the performance boost we gain is non-trivial. 
+What we can do to remedy this shortcoming is to ''syntactically untie'' the weights of these different tasks. By this we mean, there is no reason to expect the optimal W for one category of inputs to be at all related to the optimal W for another category of inputs. So we let these W's be different and relax this constraint. While this for sure increases our weight matrices to learn, the performance boost we gain is non-trivial.
 
-As in FIgure 4 above, we notice our model is now conditioned upon what the syntactic categories of the inputs are. Note, we determine what the categories are via a very simple Probabilistic Context Free Grammar (PCFG) which is more or less learned by computing summary statistics over the Penn Tree Bank to learn rules such as ''The'' is always a DT, etc, etc. No deeper understanding of this part is really necessary, just know it\'s really simple. 
+As in FIgure 4 above, we notice our model is now conditioned upon what the syntactic categories of the inputs are. Note, we determine what the categories are via a very simple Probabilistic Context Free Grammar (PCFG) which is more or less learned by computing summary statistics over the Penn Tree Bank to learn rules such as ''The'' is always a DT, etc, etc. No deeper understanding of this part is really necessary, just know it\'s really simple.
 
 The only major other difference in this model is that we initialize the W's to the identity. This way the default thing to do is to average the two word vectors coming in. Slowly but surely, the model learns which vector is more important and also any rotation or scaling of the vectors that improve performance. We observe in Figure 5 that the trained weight matrices learn actually meaning!  For example, the DT-NP rule or Determiner followed by a Noun Phrase such as ''The cat'' or ''A man'', puts more emphasis on the Noun Phrase than on the Determiner. (this is obvious because the right diagonals are red meaning higher weightl). This is called the notion of soft head words, which is something that Linguists have long observed to be true for sometime, however the model learned this on its own just by looking at data. Pretty cool!
 
@@ -142,9 +141,9 @@ The only major other difference in this model is that we initialize the W's to t
   \label{fig:img5}
 \end{marginfigure}
 
-The SU-RNN does indeed outperform previously discussed models but perhaps it is still not expressive enough. If we think of modifying words, such as adverbs like ''very'', any interpolation with this word vector and the following one, is definitely not what the understood nature of ''very'' is. 
+The SU-RNN does indeed outperform previously discussed models but perhaps it is still not expressive enough. If we think of modifying words, such as adverbs like ''very'', any interpolation with this word vector and the following one, is definitely not what the understood nature of ''very'' is.
 
-As an adverb, it's literal definition is ''used for emphasis''. How can we have a vector that emphasizes any other vector that is to follow when we are solely performing a linear interpolation? How can we construct a vector that will ''scale'' any other vector this way? Truth is we can not. We need to have some form of multiplication of word on another word. We uncover two such compositions below that enable this. The first utilizes word matrices and the other utilizes a Quadratic equation over the typical Affine. 
+As an adverb, it's literal definition is ''used for emphasis''. How can we have a vector that emphasizes any other vector that is to follow when we are solely performing a linear interpolation? How can we construct a vector that will ''scale'' any other vector this way? Truth is we can not. We need to have some form of multiplication of word on another word. We uncover two such compositions below that enable this. The first utilizes word matrices and the other utilizes a Quadratic equation over the typical Affine.
 
 
 \subsection{MV-RNN's (Matrix-Vector Recursive Neural Networks)}
@@ -158,7 +157,7 @@ As an adverb, it's literal definition is ''used for emphasis''. How can we have 
 
 We now augment our word representation, to not only include a word vector, but also a word matrix! So the word ''very'' will have a word vector  $v_{very} \in \mathbb{R}^{d}$ but also $V_{very} \in \mathbb{R}^{d\times d}$. This gives us the expressive ability to not only embed what a word means, but we also learn the way that words ''modify'' other words. The word matrix enables the latter. To feed two words, $a$ and $b$, into a RNN, we take their word matrices $A$ and $B$, to form our input vector x as the concatenation of vector $Ab$ and $Ba$. For our example of ''very'', $V_{very}$ could just be the identity times any scalar above one. Which would scale any neighboring word vector by that number! This is the type of expressive ability we desired. While the new word representation explodes our feature space, we can express much better the way words modify each other.
 
-By observing the errors the model makes, we see even the MV-RNN still can not express certain relations. We observe three major classes of mistakes. 
+By observing the errors the model makes, we see even the MV-RNN still can not express certain relations. We observe three major classes of mistakes.
 
 First, Negated Positives. When we say something positive but one word turns it negative, the model can not weigh that one word strong enough to flip the sentiment of the entire sentence. Figure 7 shows such an example where the swap of the word ''most'' to ''least'' should flip the entire sentiment of the sentence, but the MV-RNN does not capture this successfully.
 
@@ -191,12 +190,12 @@ Thus, we must look for an even more expressive composition algorithm that will b
 
 \subsection{RNTNs (Recursive Neural Tensor Network)}
 
-The final RNN we will cover here is by far the most successful on the three types of errors we left off with. The Recursive Neural Tensor Network does away with the notion of a word matrix, and furthermore, does away with the traditional affine transformation pre-tanh/sigmoid concept. To compose two word vectors or phrase vectors, we again concatenate them to form a vector $\in \mathbb{R}^{2d}$ but instead of putting it through an affine function then a nonlinear, we put it through a quadratic first, then a nonlinear, such as: 
+The final RNN we will cover here is by far the most successful on the three types of errors we left off with. The Recursive Neural Tensor Network does away with the notion of a word matrix, and furthermore, does away with the traditional affine transformation pre-tanh/sigmoid concept. To compose two word vectors or phrase vectors, we again concatenate them to form a vector $\in \mathbb{R}^{2d}$ but instead of putting it through an affine function then a nonlinear, we put it through a quadratic first, then a nonlinear, such as:
 \begin{equation}
 h^{(1)} = tanh(x^T V x + Wx)
 \end{equation}
 
-Note that $V$ is a 3rd order tensor in $\in \mathbb{R}^{2d \times 2d \times d}$.  We compute $ x^T V[i] x $  $\forall i \in [1, 2, ... d]$ slices of the tensor outputting a vector $\in \mathbb{R}^{d}$. We then add $Wx$ and put it through a nonlinear function. The quadratic shows that we can indeed allow for the multiplicative type of interaction between the word vectors without needing to maintain and learn word matrices! 
+Note that $V$ is a 3rd order tensor in $\in \mathbb{R}^{2d \times 2d \times d}$.  We compute $ x^T V[i] x $  $\forall i \in [1, 2, ... d]$ slices of the tensor outputting a vector $\in \mathbb{R}^{d}$. We then add $Wx$ and put it through a nonlinear function. The quadratic shows that we can indeed allow for the multiplicative type of interaction between the word vectors without needing to maintain and learn word matrices!
 
 
 \begin{marginfigure}%
@@ -212,9 +211,9 @@ Note that $V$ is a 3rd order tensor in $\in \mathbb{R}^{2d \times 2d \times d}$.
   \label{fig:img11}
 \end{marginfigure}
 
-As we see in Figure 11, the RNTN is the only model that is capable of succeeding on these very hard datasets. 
+As we see in Figure 11, the RNTN is the only model that is capable of succeeding on these very hard datasets.
 
-We will continue next time with a model that actually outperforms the RNTN in some aspects and it does not require an input parse tree! This model is the Dynamic Convolutional Neural Network, and we will talk about that soon. 
+We will continue next time with a model that actually outperforms the RNTN in some aspects and it does not require an input parse tree! This model is the Dynamic Convolutional Neural Network, and we will talk about that soon.
 %Good luck on your midterm!
 
 \section{CNNs (Convolutional Neural Networks)}
@@ -291,7 +290,7 @@ For instance, the following sentence contains the noun phrase: "wonderful CS224N
 \item I want to be enrolled in the wonderful CS224N!
 \end{itemize}
 
-We can rewrite the sentence by moving that whole phrase to the front as below. 
+We can rewrite the sentence by moving that whole phrase to the front as below.
 \begin{itemize}
 \item The wonderful CS224N I want to be enrolled in!
 \end{itemize}
@@ -364,7 +363,7 @@ We parse the sentence 'John hits the ball' in terms of dependency-based parse tr
 
 
 % \subsection{Defining Convolution}
-% A bunch of inner products of a filter and a subset of a vector (or matrix) performed at the same time over strides of the full vector (or matrix). 
+% A bunch of inner products of a filter and a subset of a vector (or matrix) performed at the same time over strides of the full vector (or matrix).
 
 % \begin{marginfigure}%
 %   \includegraphics[width=\linewidth]{img13}
@@ -409,9 +408,9 @@ We parse the sentence 'John hits the ball' in terms of dependency-based parse tr
 
 % Kalchbrenner actually dubs it a Dynamic Convolutional Neural Network for reasons we will explain soon.
 
-% The model takes as input S, a “sentence image”, which is a (s x d)-matrix of word vectors that comprises a sentence’s words in the same order as they appear in the sentence. The model first zero pads the matrix on left and right to make S a (s+m-1 x d) matrix. Then performs a 1-dimension convolution (in the direction of the sentence progression) with S and a series of filters each of size m. Note m is usually between 3-10 depending on the developers preference. m=6 provided best results. The zero padding ensures that the width of the sentence matrix is never smaller than the size of the filters. This is called Wide-Convolution. It is important to note that the model utilizes f filters, f being some number of filters FOR EACH dimension in the word vector space. Making the matrix M that contains all the filters a  (f  x m x d) which is a 3rd-order tensor. And the output of the convolution step C a 3rd-order  tensor of size (s+m-1 x f x d). Kalchbrenner actually calls this matrix C, f separate feature maps, to align with what is discussed in Computer Vision as edge detectors. Note that no mixing of the dimensions has been performed. To fix this we fold over C by taking every other row and summing it with the previous one, shrinking our C by half (s+m-1 x f x d/2). Now for the “dynamic part”. We take the folded matrix and perform a dynamic k-max pooling step. K-max pooling is different than a normal max pooling step in that it returns the k max numbers rather than just the max. The dynamic piece comes into play in that we dynamically choose k depending on which layer we are in. The formula they use is arbitrary but gets smaller as we go deeper into the network. This is to ensure we do not lose information along the way, since we can have a sentence of arbitrary length. 
+% The model takes as input S, a “sentence image”, which is a (s x d)-matrix of word vectors that comprises a sentence’s words in the same order as they appear in the sentence. The model first zero pads the matrix on left and right to make S a (s+m-1 x d) matrix. Then performs a 1-dimension convolution (in the direction of the sentence progression) with S and a series of filters each of size m. Note m is usually between 3-10 depending on the developers preference. m=6 provided best results. The zero padding ensures that the width of the sentence matrix is never smaller than the size of the filters. This is called Wide-Convolution. It is important to note that the model utilizes f filters, f being some number of filters FOR EACH dimension in the word vector space. Making the matrix M that contains all the filters a  (f  x m x d) which is a 3rd-order tensor. And the output of the convolution step C a 3rd-order  tensor of size (s+m-1 x f x d). Kalchbrenner actually calls this matrix C, f separate feature maps, to align with what is discussed in Computer Vision as edge detectors. Note that no mixing of the dimensions has been performed. To fix this we fold over C by taking every other row and summing it with the previous one, shrinking our C by half (s+m-1 x f x d/2). Now for the “dynamic part”. We take the folded matrix and perform a dynamic k-max pooling step. K-max pooling is different than a normal max pooling step in that it returns the k max numbers rather than just the max. The dynamic piece comes into play in that we dynamically choose k depending on which layer we are in. The formula they use is arbitrary but gets smaller as we go deeper into the network. This is to ensure we do not lose information along the way, since we can have a sentence of arbitrary length.
 
-% This whole process occurs one more time and then has a standard softmax output layer to deliver us a sentiment score. The DCNN results actually outperform RNTN in both the top level fine grained (5 label case) and the top level coarse accuracy (just positive or negative). However, the author does not include the results of the sub-phrase results. My assumption is that the RNTN performs better at small sentence/phrase lengths; otherwise Kalchbrenner would have included the results. Furthermore, it is intuitive that the DCNN performs more poorly on small phrases because the sentence matrix would consist of mostly the zero padding, giving much less information when convolved, and the information is essentially “watered down”. 
+% This whole process occurs one more time and then has a standard softmax output layer to deliver us a sentiment score. The DCNN results actually outperform RNTN in both the top level fine grained (5 label case) and the top level coarse accuracy (just positive or negative). However, the author does not include the results of the sub-phrase results. My assumption is that the RNTN performs better at small sentence/phrase lengths; otherwise Kalchbrenner would have included the results. Furthermore, it is intuitive that the DCNN performs more poorly on small phrases because the sentence matrix would consist of mostly the zero padding, giving much less information when convolved, and the information is essentially “watered down”.
 
 
 \end{document}

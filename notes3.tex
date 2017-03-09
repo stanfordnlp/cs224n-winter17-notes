@@ -1,8 +1,8 @@
 \documentclass{tufte-handout}
 
-\title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
-
-\author[Rohit Mundra, Richard Socher]{Lecture Notes: Part III\thanks{Author: Rohit Mundra, Amani Peddada, Richard Socher,  Qiaojing Yan}}
+\title{CS224n: Natural Language Processing with Deep Learning
+       \thanks{Course Instructors: Christopher Manning, Richard Socher} \\
+       \Large Lecture Notes: Part III\thanks{Authors: Rohit Mundra, Amani Peddada, Richard Socher,  Qiaojing Yan}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -84,7 +84,7 @@ This formulation can be visualized in the manner shown in Figure~\ref{fig:sigmoi
 
 \subsection{A Single Layer of Neurons}\label{sec:neuronlayer}
 
-We extend the idea above to multiple neurons by considering the case where the input $x$ is fed as an input to multiple such neurons as shown in Figure~\ref{fig:SingleLayerNeuralNetwork}. 
+We extend the idea above to multiple neurons by considering the case where the input $x$ is fed as an input to multiple such neurons as shown in Figure~\ref{fig:SingleLayerNeuralNetwork}.
 
 If we refer to the different neurons' weights as $\{w^{(1)}, \cdots, w^{(m)}\}$ and the biases as $\{b_1, \cdots, b_m\}$, we can say the respective activations are  $\{a_1, \cdots, a_m\}$:
 \begin{align*}
@@ -127,7 +127,7 @@ $$s = U^Ta$$
 
 Here, we want to classify whether or not the center word \textit{"Paris"} is a named-entity. In such cases, it is very likely that we would not just want to capture the presence of words in the window of word vectors but some other interactions between the words in order to make the classification. For instance, maybe it should matter that \textit{"Museums"} is the first word only if \textit{"in"} is the second word. Such non-linear decisions can often not be captured by inputs fed directly to a Softmax function but instead require the scoring of the intermediate layer discussed in Section~\ref{sec:neuronlayer}. We can thus use another matrix $U \in R^{m\times 1}$ to generate an unnormalized score for a classification task from the activations:
 $$s = U^Ta = U^T f(Wx + b)$$
-where $f$ is the activation function. 
+where $f$ is the activation function.
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{SimpleFF}
@@ -139,7 +139,7 @@ where $f$ is the activation function.
 
 \subsection{Maximum Margin Objective Function}\label{sec:maxmargin}
 
-Like most machine learning models, neural networks also need an optimization objective, a measure of error or goodness which we want to minimize or maximize respectively. Here, we will discuss a popular error metric known as the maximum margin objective. The idea behind using this objective is to ensure that the score computed for "true" labeled data points is higher than the score computed for "false" labeled data points. 
+Like most machine learning models, neural networks also need an optimization objective, a measure of error or goodness which we want to minimize or maximize respectively. Here, we will discuss a popular error metric known as the maximum margin objective. The idea behind using this objective is to ensure that the score computed for "true" labeled data points is higher than the score computed for "false" labeled data points.
 
 Using the previous example, if we call the score computed for the "true" labeled window \textit{"Museums in Paris are amazing"} as $s$ and the score computed for the "false" labeled window \textit{"Not all museums in Paris"} as $s_c$ (subscripted as $c$ to signify that the window is "corrupt").
 
@@ -170,7 +170,7 @@ Here, we use a neural network with a single hidden layer and a single unit outpu
 \item $x_i$ is an input to the neural network.
 \item $s$ is the output of the neural network.
 \item Each layer (including the input and output layers) has neurons which receive an input and produce an output. The $j$-th neuron of layer $k$ receives the scalar input $z_j^{(k)}$ and produces the scalar activation output $a_j^{(k)}$.
-\item We will call the backpropagated error calculated at $z_j^{(k)}$ as $\delta_j^{(k)}$. 
+\item We will call the backpropagated error calculated at $z_j^{(k)}$ as $\delta_j^{(k)}$.
 \item Layer 1 refers to the input layer and not the first hidden layer. For the input layer, $x_j = z_j^{(1)} = a_j^{(1)}$.
 \item $W^{(k)}$ is the transfer matrix that maps the output from the $k$-th layer to the input to the  $(k+1)$-th Thus, $W^{(1)} = W$ and $W^{(2)} = U$ to put this new generalized notation in perspective of Section~\ref{sec:ff}.
 \end{itemize}
@@ -223,7 +223,7 @@ Notice that the result we arrive at using this approach is exactly the same as t
 $$ $$
 \textbf{Bias Updates:} Bias terms (such as $b^{(1)}_1$) are mathematically equivalent to other weights contributing to the neuron input ($z^{(2)}_1$) as long as the input being forwarded is 1. As such, the bias gradients for neuron $i$ on layer $k$ is simply $\delta^{(k)}_i$. For instance, if we were updating $b_1^{(1)}$ instead of $W^{(1)}_{14}$ above, the gradient would simply be $f'(z_1^{(2)}) W_{1}^{(2)}$.
 $$ $$
-\textbf{Generalized steps to propagate $\delta^{(k)}$ to $\delta^{(k-1)}$:} 
+\textbf{Generalized steps to propagate $\delta^{(k)}$ to $\delta^{(k-1)}$:}
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{ErrorSignal2}
   \caption{Propagating error from $\delta^{(k)}$ to $\delta^{(k-1)}$}
@@ -251,7 +251,7 @@ $$ $$
 
 So far, we discussed how to calculate gradients for a given parameter in the model. Here we will generalize the approach above so that we update weight matrices and bias vectors all at once. Note that these are simply extensions of the above model that will help build intuition for the way error propagation can be done at a matrix-vector level.
 
-For a given parameter $W_{ij}^{(k)}$, we identified that the error gradient is simply $\delta_{i}^{(k+1)}\cdot a_j^{(k)}$. As a reminder, $W^{(k)}$ is the matrix that maps $a^{(k)}$ to $z^{(k+1)}$. We can thus establish that the error gradient for the entire matrix $W^{(k)}$ is: 
+For a given parameter $W_{ij}^{(k)}$, we identified that the error gradient is simply $\delta_{i}^{(k+1)}\cdot a_j^{(k)}$. As a reminder, $W^{(k)}$ is the matrix that maps $a^{(k)}$ to $z^{(k+1)}$. We can thus establish that the error gradient for the entire matrix $W^{(k)}$ is:
 $$ \nabla_{W^{(k)}} = \begin{bmatrix} \delta_{1}^{(k+1)} a_1^{(k)} & \delta_{1}^{(k+1)} a_2^{(k)} & \cdots \\ \delta_{2}^{(k+1)} a_1^{(k)} & \delta_{2}^{(k+1)} a_2^{(k)} & \cdots \\ \vdots & \vdots & \ddots \end{bmatrix} = \delta^{(k+1)} a^{(k)T}$$
 
 \marginnote{\textbf{Error propagates} from layer $(k+1)$ to $(k)$ in the following manner:
@@ -291,19 +291,19 @@ Now, a natural question you might ask is, if this method is so precise, why do w
 \begin{verbatim}
 
 def eval_numerical_gradient(f, x):
-  """ 
-  a naive implementation of numerical gradient of f at x 
+  """
+  a naive implementation of numerical gradient of f at x
   - f should be a function that takes a single argument
-  - x is the point (numpy array) to evaluate the gradient 
+  - x is the point (numpy array) to evaluate the gradient
   at
-  """ 
+  """
 
   fx = f(x) # evaluate function value at original point
   grad = np.zeros(x.shape)
   h = 0.00001
 
   # iterate over all indexes in x
-  it = np.nditer(x, flags=['multi_index'], 
+  it = np.nditer(x, flags=['multi_index'],
   	                op_flags=['readwrite'])
   while not it.finished:
 
@@ -314,13 +314,13 @@ def eval_numerical_gradient(f, x):
     fxh_left = f(x) # evaluate f(x + h)
     x[ix] = old_value - h # decrement by h
     fxh_right = f(x) # evaluate f(x - h)
-    x[ix] = old_value # restore to previous value (very 
+    x[ix] = old_value # restore to previous value (very
     			      important!)
 
     # compute the partial derivative
     grad[ix] = (fxh_left - fxh_right) / (2*h) # the slope
     it.iternext() # step to next dimension
-  return grad  
+  return grad
 \end{verbatim}
 \label{snip:gradcheck}
 \end{theorem}
@@ -340,7 +340,7 @@ There are indeed other types of regularization that are sometimes used, such as 
 
 \subsection{Dropout}
 
-Dropout is a powerful technique for regularization, first introduced by Srivastava et al. in \textit{Dropout: A Simple Way to Prevent Neural Networks from Overfitting}.  The idea is simple yet effective -- during training, we will randomly ``drop'' with some probability $(1-p)$ a subset of neurons during each forward/backward pass (or equivalently, we will keep alive each neuron with a probability $p$). Then, during testing, we will use the full network to compute our predictions. The result is that the network typically learns more meaningful information from the data, is less likely to overfit, and usually obtains higher performance overall on the task at hand. One intuitive reason why this technique should be so effective is that what dropout is doing is essentially doing is training exponentially many smaller networks at once and averaging over their predictions. 
+Dropout is a powerful technique for regularization, first introduced by Srivastava et al. in \textit{Dropout: A Simple Way to Prevent Neural Networks from Overfitting}.  The idea is simple yet effective -- during training, we will randomly ``drop'' with some probability $(1-p)$ a subset of neurons during each forward/backward pass (or equivalently, we will keep alive each neuron with a probability $p$). Then, during testing, we will use the full network to compute our predictions. The result is that the network typically learns more meaningful information from the data, is less likely to overfit, and usually obtains higher performance overall on the task at hand. One intuitive reason why this technique should be so effective is that what dropout is doing is essentially doing is training exponentially many smaller networks at once and averaging over their predictions.
 
 
 \marginnote{
@@ -397,7 +397,7 @@ The hard tanh function is sometimes preferred over the tanh function since it is
        1 & : z > 1
      \end{array}
    \right.
-\end{displaymath} 
+\end{displaymath}
 The derivative can also be expressed in a piecewise functional form:
 \begin{displaymath}
     \operatorname{hardtanh}'(z) = \left\{
@@ -406,7 +406,7 @@ The derivative can also be expressed in a piecewise functional form:
        0 & : \text{otherwise}
      \end{array}
    \right.
-\end{displaymath} 
+\end{displaymath}
 \textbf{Soft sign:}
 The soft sign function is another nonlinearity which can be considered an alternative to tanh since it too does not saturate as easily as hard clipped functions:
 \begin{marginfigure}%
@@ -434,7 +434,7 @@ The derivative is then the piecewise function:
        0 & : \text{otherwise}
      \end{array}
    \right.
-\end{displaymath} 
+\end{displaymath}
 \textbf{Leaky ReLU:} Traditional ReLU units by design do not propagate any error for non-positive $z$ -- the leaky ReLU modifies this such that a small error is allowed to propagate backwards even when $z$ is negative:
 
 \begin{marginfigure}%
@@ -453,7 +453,7 @@ This way, the derivative is representable as:
        k & : \text{otherwise}
      \end{array}
    \right.
-\end{displaymath} 
+\end{displaymath}
 
 \subsection{Data Preprocessing}
 As is the case with machine learning models generally, a key step to ensuring that your model obtains reasonable performance on the task at hand is to perform basic preprocessing on your data. Some common techniques are outlined below.\\
@@ -499,7 +499,7 @@ The simple solution to avoiding a diverging loss is to use a very small learning
 
 % Furthermore, we can keep this learning rate fixed for all parameters in the model instead of having a more complex scheme in which each parameter has its own learning rate.
 
-Since training is the most expensive phase in a deep learning system, some research has attempted to improve this naive approach to setting learning learning rates. For instance, \textsc{Ronan Collobert} scales the learning rate of a weight $W_{ij}$  (where $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$) by the inverse square root of the fan-in of the neuron ($n^{(l)}$). 
+Since training is the most expensive phase in a deep learning system, some research has attempted to improve this naive approach to setting learning learning rates. For instance, \textsc{Ronan Collobert} scales the learning rate of a weight $W_{ij}$  (where $W \in \mathbb{R}^{n^{(l+1)}\times n^{(l)}}$) by the inverse square root of the fan-in of the neuron ($n^{(l)}$).
 
 There are several other techniques that have proven to be effective as well -- one such method is \textbf{annealing}, where, after several iterations, the learning rate is reduced in some way -- this method ensures that we start off with a high learning rate and approach a minimum quickly; as we get closer to the minimum, we start lowering our learning rate so that we can find the optimum under a more fine-grained scope. A common way to perform annealing is to reduce the learning rate $\alpha$ by a factor $x$ after every $n$ iterations of learning. Exponential decay is also common, where, the learning rate $\alpha$ at iteration $t$ is given by $\alpha(t) = \alpha_0e^{-kt}$, where $\alpha_0$ is the initial learning rate, and $k$ is a hyperparameter. Another approach is to allow the learning rate to decrease over time such that:
 

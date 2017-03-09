@@ -1,8 +1,8 @@
 \documentclass{tufte-handout}
 
-\title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
-
-\author[]{Lecture Notes: Part VI\thanks{Authors: Guillaume Genthial, Lucas Liu, Barak Oshri, Kushal Ranjan}}
+\title{CS224n: Natural Language Processing with Deep Learning
+       \thanks{Course Instructors: Christopher Manning, Richard Socher} \\
+       \Large Lecture Notes: Part VI\thanks{Authors: Guillaume Genthial, Lucas Liu, Barak Oshri, Kushal Ranjan}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -63,7 +63,7 @@ So far in this class, we've dealt with problems of predicting a single output: a
 In these notes, we'll look at sequence-to-sequence models, a deep learning-based framework for handling these types of problems. This framework proved to be very effective, and has, in fewer than 3 years, become the standard for machine translation.
 
 \subsection{Brief Note on Historical Approaches}
-%At this point, it may help to consider how Seq2Seq is a departure from previous models. 
+%At this point, it may help to consider how Seq2Seq is a departure from previous models.
 In the past, translation systems were based on probabilistic models constructed from:
 \begin{itemize}
 \item a \textbf{translation model}, telling us what a sentence/phrase in a source language most likely translates into
@@ -143,7 +143,7 @@ Bidirectional RNNs fix this problem by traversing a sequence in both directions 
 
 When you hear the sentence "the ball is on the field," you don't assign the same importance to all 6 words. You primarily take note of the words "ball," "on," and "field," since those are the words that are most "important" to you. Similarly, Bahdanau et al. noticed the flaw in using the final RNN hidden state as the single "context vector" for sequence-to-sequence models: often, different parts of an input have different levels of significance. Moreover, different parts of the output may even consider different parts of the input "important." For example, in translation, the first word of output is \textit{usually} based on the first few words of the input, but the last word is likely based on the last few words of input.
 
-Attention mechanisms make use of this observation by providing the decoder network with a look at the \textit{entire input sequence} at every decoding step; the decoder can then decide what input words are important at any point in time. There are many types of encoder mechanisms, but we'll examine the one introduced by Bahdanau et al.  \footnote{Bahdanau et al. 2014, "Neural Machine Translation by Jointly Learning to Align and Translate"}, 
+Attention mechanisms make use of this observation by providing the decoder network with a look at the \textit{entire input sequence} at every decoding step; the decoder can then decide what input words are important at any point in time. There are many types of encoder mechanisms, but we'll examine the one introduced by Bahdanau et al.  \footnote{Bahdanau et al. 2014, "Neural Machine Translation by Jointly Learning to Align and Translate"},
 %Concretely, we maintain a feed-forward neural network (e.g. a single-layer network with weights $W_a$, bias $b_a$, and softmax activation) that assigns a weight $a_{ij}$ to each word $j$ in the input $x_1,...,x_N$ for decoding step $i$. To do this, during the encoding process, we'll maintain a list of each $h_j$, the encoder's hidden state after the $j$'th input word. At the $i$'th decoding step, the attention mechanism uses the decoder's hidden state $s_{i - 1}$ along with the input hidden states $e_j$ to decide \textit{how important each input word is to output word $i$}:
 
 
@@ -152,7 +152,7 @@ Attention mechanisms make use of this observation by providing the decoder netwo
 
 \subsection{Bahdanau et al. NMT model}
 
-Remember that our seq2seq model is made of two parts, an \textbf{encoder} that encodes the input sentence, and a \textbf{decoder} that leverages the information extracted by the decoder to produce the translated sentence. Basically, our input is a sequence of words $ x_1, \ldots, x_n $ that we want to translate, and our target sentence is a sequence of words $ y_1, \ldots, y_m $. 
+Remember that our seq2seq model is made of two parts, an \textbf{encoder} that encodes the input sentence, and a \textbf{decoder} that leverages the information extracted by the decoder to produce the translated sentence. Basically, our input is a sequence of words $ x_1, \ldots, x_n $ that we want to translate, and our target sentence is a sequence of words $ y_1, \ldots, y_m $.
 %Let's have a look at how we produce our sequence of $ y_i $ from the $ x_i $.
 
 \begin{enumerate}
@@ -165,11 +165,11 @@ We want to compute the hidden states $ s_i $ of the decoder using a recursive fo
 
 $$ s_i = f(s_{i-1}, y_{i-1}, c_i) $$
 
-where $ s_{i-1} $ is the previous hidden vector, $ y_{i-1}$ is the generated word at the previous step, and $ c_i $ is a context vector that capture the context from the original sentence that is relevant to the time step $ i $ of the decoder. 
+where $ s_{i-1} $ is the previous hidden vector, $ y_{i-1}$ is the generated word at the previous step, and $ c_i $ is a context vector that capture the context from the original sentence that is relevant to the time step $ i $ of the decoder.
 
 %We don't specify the function $ f$ here, but it could be any type of recurrent neural cell (GRU, LSTM, etc.).
 
-The context vector $c_i$ captures relevant information for the $i$-th decoding time step (unlike the standard Seq2Seq in which there's only one context vector). For each hidden vector from the original sentence $ h_j $, compute a score 
+The context vector $c_i$ captures relevant information for the $i$-th decoding time step (unlike the standard Seq2Seq in which there's only one context vector). For each hidden vector from the original sentence $ h_j $, compute a score
 
 $$ e_{i,j} = a(s_{i-1}, h_j) $$
 
@@ -187,7 +187,7 @@ Intuitively, this vector captures the relevant contextual information from the o
 
 \end{enumerate}
 
-%This context is now used in addition to output word $o_{i - 1}$ as an input to the decoder for step $i$. 
+%This context is now used in addition to output word $o_{i - 1}$ as an input to the decoder for step $i$.
 
 \subsection{Connection with translation alignment}
 
@@ -218,7 +218,7 @@ The major advantage of attention-based models is their ability to efficiently tr
 
 \subsection{Huong et al. NMT model}
 
-We present a variant of this first model, with two different mechanisms of attention, from Luong et al.\footnote{\textit{Effective Approaches to Attention-based Neural Machine Translation} by Minh-Thang Luong,  Hieu Pham and Christopher D. Manning}. 
+We present a variant of this first model, with two different mechanisms of attention, from Luong et al.\footnote{\textit{Effective Approaches to Attention-based Neural Machine Translation} by Minh-Thang Luong,  Hieu Pham and Christopher D. Manning}.
 
 \begin{itemize}
 \item \textbf{Global attention} We run our vanilla Seq2Seq NMT. We call the hidden states given by the encoder $ h_1, \ldots, h_n $, and the hidden states of the decoder $ \bar{h_1}, \ldots, \bar{h_n}$. Now, for each $ \bar{h_i}$, we compute an attention vector over the encoder hidden. We can use one of the following scoring functions:
@@ -228,13 +228,13 @@ $$ score(h_i, \bar{h_j}) = \begin{cases}
 h_i^T \bar{h_j}\\
 h_i^T W \bar{h_j}\\
 W [h_i, \bar{h_j}]
-\end{cases} \in \mathbb{R} $$ 
+\end{cases} \in \mathbb{R} $$
 
 Now that we have a vector of scores, we can compute a context vector in the same way as Bahdanau et al. First, we normalize the scores via a softmax layer to obtain a vector $ \alpha_i = (\alpha_{i, 1}, \ldots , \alpha_{i,n}) $, where $ \alpha_{i,j} = \frac{exp(score(h_j, \bar{h_i}))}{\sum_{k=1}^n exp(score(h_k, \bar{h_i}))} $
 
 $$ c_i = \sum_{j=1}^n \alpha_{i, j} h_j$$
 
-and we can use the context vector and the hidden state to compute a new vector for the $i$-th time step of the decoder 
+and we can use the context vector and the hidden state to compute a new vector for the $i$-th time step of the decoder
 
 $$ \tilde{h_i} = f([\bar{h_i}, c_i]) $$
 
@@ -271,14 +271,14 @@ The new multilingual model not only improved their translation performance, it a
 \end{itemize}
 
 \section{Sequence model decoders}
-Another approach to machine translation comes from statistical machine translation. Consider a model that computes the probability $ \mathbb{P}(\bar{s} | s) $ of a translation $ \bar{s} $ given the original sentence $ s $. We want to pick the translation $ \bar{s}* $ that has the best probability. In other words, we want 
+Another approach to machine translation comes from statistical machine translation. Consider a model that computes the probability $ \mathbb{P}(\bar{s} | s) $ of a translation $ \bar{s} $ given the original sentence $ s $. We want to pick the translation $ \bar{s}* $ that has the best probability. In other words, we want
 
 $$ \bar{s}* = \operatorname{argmax}_{\bar{s}}(\mathbb{P}(\bar{s} | s )) $$
 
 As the search space can be huge, we need to shrink its size. Here is a list of sequence model decoders (both good ones and bad ones).
 \begin{itemize}
 \item \textbf{Exhaustive search} : this is the simplest idea. We compute the probability of every possible sequence, and we chose the sequence with the highest probability. However, this technique does not scale \emph{at all} to large outputs as the search space is exponential in the size of the input. Decoding in this case is an NP-complete problem.
-\item \textbf{Ancestral sampling} : at time step $ t$, we sample $ x_t $  based on the conditional probability of the word at step $ t$ given the past. In other words, 
+\item \textbf{Ancestral sampling} : at time step $ t$, we sample $ x_t $  based on the conditional probability of the word at step $ t$ given the past. In other words,
 
 $$ x_t \sim \mathbb{P}( x_t | x_1, \ldots, x_n) $$
 
@@ -296,7 +296,7 @@ and compute $ \mathcal{H}_{t+1} $ by expanding $ \mathcal{H}_t $ and keeping the
 
 $$ \tilde{\mathcal{H}}_{t+1} = \bigcup_{k=1}^K \tilde{\mathcal{H}_{t+1}^k}$$
 
-where 
+where
 
 $$ \tilde{\mathcal{H}_{t+1}^k} = \{ (x_1^k, \ldots, x_t^k, v_1), \ldots,  (x_1^k, \ldots, x_t^k, v_{|V|})\}$$
 
@@ -307,9 +307,9 @@ As we increase $ K $, we gain precision and we are asymptotically exact. However
 % from the feb 21 lecture
 % no need to cover the LSTM and GRU part that are already covered in past lecture notes
 % may just add a reference to it
-Now that we know the basics about machine translation systems, we discuss some ways that these models are evaluated. Evaluating the quality of translations is a notoriously tricky and subjective task. In real-life, if you give a paragraph of text to ten different translators, you will get back ten different translations. Translations are imperfect and noisy in practice. They attend to different information and emphasize different meanings. One translation can preserve metaphors and the integrity of long-randing ideas, while the other can achieve a more faithful reconstruction of syntax and style, attempting a word-to-word translation.  Note that this flexibility is not a burden; it is a testament to the complexity of language and our abilities to decode and interpret meaning, and is a wonderful aspect of our communicative faculty. 
+Now that we know the basics about machine translation systems, we discuss some ways that these models are evaluated. Evaluating the quality of translations is a notoriously tricky and subjective task. In real-life, if you give a paragraph of text to ten different translators, you will get back ten different translations. Translations are imperfect and noisy in practice. They attend to different information and emphasize different meanings. One translation can preserve metaphors and the integrity of long-randing ideas, while the other can achieve a more faithful reconstruction of syntax and style, attempting a word-to-word translation.  Note that this flexibility is not a burden; it is a testament to the complexity of language and our abilities to decode and interpret meaning, and is a wonderful aspect of our communicative faculty.
 
-At this point, you should note that there is a difference between the objective \textit{loss} function of your model and the \textit{evaluation} methods we are going to discuss. Since loss functions are in essence an evaluation of your model prediction, it can be easy to confuse the two ideas. The evaluation metrics ahead offer a final, summative assessment of your model against some measurement criterion, and no one measurement is superior to all others, though some have clear advantages and majority preference. 
+At this point, you should note that there is a difference between the objective \textit{loss} function of your model and the \textit{evaluation} methods we are going to discuss. Since loss functions are in essence an evaluation of your model prediction, it can be easy to confuse the two ideas. The evaluation metrics ahead offer a final, summative assessment of your model against some measurement criterion, and no one measurement is superior to all others, though some have clear advantages and majority preference.
 
 Evaluating the quality of machine learning translations has become it own entire research area, with many proposals like TER, METEOR, MaxSim, SEPIA, and RTE-MT. We will focus in these notes on two baseline evaluation methods and BLEU.
 
@@ -317,7 +317,7 @@ Evaluating the quality of machine learning translations has become it own entire
 The first and maybe least surprising method is to have people manually evaluate the correctness, adequacy, and fluency of your system. Like the Turing Test, if you can fool a human into not being able to distinguish a human-made translation with your system translation, your model passes the test for looking like a real-life sentence! The obvious problem with this method is that it is costly and inefficient, though it remains the gold standard for machine translation.
 
 \subsection{Evaluation against another task}
-A common way of evaluating machine learning models that output a useful \textit{representation} of some data (a representation being a translation or summary) is that if your predictions are useful for solving some challenging task, then the model must be encoding relevant information in your predictions. 
+A common way of evaluating machine learning models that output a useful \textit{representation} of some data (a representation being a translation or summary) is that if your predictions are useful for solving some challenging task, then the model must be encoding relevant information in your predictions.
 For example, you might think of training your translation predictions on a question-answering task in the translated language. That is, you use the outputs of your system as inputs to a model for some other task (the question-answering). If your second task can perform as well on your predictions as it can on well-formed data in the translated language, it means that your inputs have the relevant information or patterns for meeting the demands of the task.
 
 The issue with this method is that the second task may not be affected by many of the finer points of translation. For example, if you measured the quality of translation on a query-retrieval task (like pulling up the right webpage for a search query), you would find that a translation that preserves the main topic words of the documents but ignores syntax and grammar might still fit the task well. But this itself doesn't mean that the quality of your translations is accurate or faithful. Therefore, determining the quality of the translation model is just shifted to determining the quality of the task itself, which may or may not be a good standard.
@@ -329,22 +329,22 @@ The BLEU algorithm evaluates the precision score of a candidate machine translat
 
 \begin{enumerate}[A]
 \item there are many ways to evaluate the quality of a translation, like comparing the number of n-grams between a candidate translation and reference.
-\item the quality of a translation is evaluate of n-grams in a reference and with translation. 
+\item the quality of a translation is evaluate of n-grams in a reference and with translation.
 \end{enumerate}
 
 The BLEU score looks for whether n-grams in the machine translation also appear in the reference translation. Color-coded below are some examples of different size n-grams that are shared between the reference and candidate translation.
 
 \begin{enumerate}[A]
-\item there are many ways to evaluate \color{blue} the quality of a translation\color{black}, like comparing the number \color{red} of n-grams \color{black} between a candidate translation and \color{green} reference\color{black}. 
+\item there are many ways to evaluate \color{blue} the quality of a translation\color{black}, like comparing the number \color{red} of n-grams \color{black} between a candidate translation and \color{green} reference\color{black}.
 
-\item \color{blue} the quality of a translation \color{black} is evaluate \color{red} of n-grams \color{black} in a \color{green} reference \color{black} and with translation. 
+\item \color{blue} the quality of a translation \color{black} is evaluate \color{red} of n-grams \color{black} in a \color{green} reference \color{black} and with translation.
 \end{enumerate}
 
-The BLEU algorithm identifies all such matches of n-grams above, including the unigram matches, and evaluates the strength of the match with the \textit{precision} score. The precision score is the fraction of n-grams in the translation that also appear in the reference. 
+The BLEU algorithm identifies all such matches of n-grams above, including the unigram matches, and evaluates the strength of the match with the \textit{precision} score. The precision score is the fraction of n-grams in the translation that also appear in the reference.
 
 The algorithm also satisfies two other constraints. For each n-gram size, a gram in the reference translation cannot be matched more than once. For example, the unigram "a" appears twice in B but only once in A. This only counts for one match between the sentences. Additionally, we impose a brevity penalty so that very small sentences that would achieve a 1.0 precision (a "perfect" matching) are not considered good translations. For example, the single word "there" would achieve a 1.0 precision match, but it is obviously not a good match.
 
-Let us see how to actually compute the BLEU score. First let $k$ be the maximum n-gram that we want to evaluate our score on. That is, if $k=4$, the BLUE score only counts the number of n-grams with length less than or equal to 4, and ignores larger n-grams. Let 
+Let us see how to actually compute the BLEU score. First let $k$ be the maximum n-gram that we want to evaluate our score on. That is, if $k=4$, the BLUE score only counts the number of n-grams with length less than or equal to 4, and ignores larger n-grams. Let
 \begin{equation*}
 p_n =  \# \text{ matched n-grams / \# n-grams in candidate translation}
 \end{equation*}
@@ -375,7 +375,7 @@ The idea of NCE is to approximate "softmax" by randomly sampling K words from ne
 
 \item \textbf{Hierarchical Softmax} \newline
 Morin et al.\footnote{Morin et al. 2005, \textit{Hierarchical Probabilistic Neural Network Language Model}}
-introduced a binary tree structure to more efficently compute "softmax". Each probability in the target distribution is calculated by taking a path down the tree which only takes $O(log|V|)$ steps. Notably, even though Hierarchical Softmax saves computation, it cannot be easily parallelized to run efficiently on GPU. This method is used by Kim et al. \footnote{Kim et al. 2015, \textit{Character-Aware Neural Language Models}} to train character-based language models which will be covered in lecture 13. 
+introduced a binary tree structure to more efficently compute "softmax". Each probability in the target distribution is calculated by taking a path down the tree which only takes $O(log|V|)$ steps. Notably, even though Hierarchical Softmax saves computation, it cannot be easily parallelized to run efficiently on GPU. This method is used by Kim et al. \footnote{Kim et al. 2015, \textit{Character-Aware Neural Language Models}} to train character-based language models which will be covered in lecture 13.
 \end{enumerate}
 
 One limitation for both methods is that they only save computation during training step (when target word is known). At test time, one still has to compute the probability of all words in the vocabulary in order to make predictions.
@@ -392,10 +392,10 @@ Large Target Vocabulary for Neural Machine Translation}} proposed a method to ma
 	\label{fig:partition}
 \end{marginfigure}
 
-This concept is very similar to NCE in that for any given word, the output vocabulary contains the target word and $|V'|-1$ negative (noise) samples. However, the main difference is that these negative samples are sampled from a biased distribution $Q$ for each subset V' where 
+This concept is very similar to NCE in that for any given word, the output vocabulary contains the target word and $|V'|-1$ negative (noise) samples. However, the main difference is that these negative samples are sampled from a biased distribution $Q$ for each subset V' where
 \[
   Q(y_t)=\begin{cases}
-               \frac{1}{|V'|}, if y_t \in |V'|\\ 
+               \frac{1}{|V'|}, if y_t \in |V'|\\
                0, otherwise\\
             \end{cases}
 \]
@@ -428,7 +428,7 @@ between Human and Machine Translation}} on this method, " \textit{this approach 
 at scale --- the attention mechanism is unstable when
 the network is deep --- and copying may not always be
 the best strategy for rare words --- sometimes
-transliteration is more appropriate}". 
+transliteration is more appropriate}".
 
 
 
@@ -477,6 +477,6 @@ with Hybrid Word-Character Models}} proposed a Hybrid Word-Character model to de
 
 %\section{Speech Processing}
 % from the feb 23 lecture
-% topics yet 
+% topics yet
 
 \end{document}

@@ -1,8 +1,8 @@
 \documentclass{tufte-handout}
 
-\title{CS224n: Natural Language Processing with Deep Learning\thanks{Course Instructors: Christopher Manning, Richard Socher}}
-
-\author[Lisa Wang, Juhi Naik, Shayne Longpre]{Lecture Notes: Part IV\thanks{Authors: Lisa Wang, Juhi Naik, and Shayne Longpre}}
+\title{CS224n: Natural Language Processing with Deep Learning
+       \thanks{Course Instructors: Christopher Manning, Richard Socher} \\
+       \Large Lecture Notes: Part IV\thanks{Authors: Lisa Wang, Juhi Naik, and Shayne Longpre}}
 
 \date{Winter 2017} % without \date command, current date is supplied
 
@@ -52,7 +52,7 @@
 \textbf{Keyphrases: Dependency Parsing.}
 %\printclassoptions
 \section{Dependency Grammar and Dependency Structure}
-Parse trees in NLP, analogous to those in compilers, are used to analyze the syntactic structure of sentences. There are two main types of structures used - constituency structures and dependency structures. 
+Parse trees in NLP, analogous to those in compilers, are used to analyze the syntactic structure of sentences. There are two main types of structures used - constituency structures and dependency structures.
 
 Constituency Grammar uses phrase structure grammar to organize words into nested constituents. This will be covered in more detail in following chapters. We now focus on Dependency Parsing.
 
@@ -67,10 +67,10 @@ Dependency structure of sentences shows which words depend on (modify or are arg
 
 \subsection{Dependency Parsing}
 
-Dependency parsing is the task of analyzing the syntactic dependency structure of a given input sentence $S$. The output of a dependency parser is a dependency tree where the words of the input sentence are connected by typed dependency relations. Formally, the dependency parsing problem asks to create a mapping from the input sentence with words $S=w_0w_1...w_n$ (where $w_0$ is the $\textsc{ROOT}$) to its dependency tree graph $G$. 
+Dependency parsing is the task of analyzing the syntactic dependency structure of a given input sentence $S$. The output of a dependency parser is a dependency tree where the words of the input sentence are connected by typed dependency relations. Formally, the dependency parsing problem asks to create a mapping from the input sentence with words $S=w_0w_1...w_n$ (where $w_0$ is the $\textsc{ROOT}$) to its dependency tree graph $G$.
 Many different variations of dependency-based methods have been developed in recent years, including neural network-based methods, which we will describe later.  \\
 % they all have in common that they do not make any assumptions of the specific dependency types (e.g. grammatical functions). \\
-To be precise, there are two subproblems in dependency parsing (adapted from Kuebler et al., chapter 1.2): 
+To be precise, there are two subproblems in dependency parsing (adapted from Kuebler et al., chapter 1.2):
 \begin{enumerate}
 \item \textit{Learning:}
 Given a training set $D$ of sentences annotated with dependency graphs, induce a parsing model $M$ that can be used to parse new sentences.
@@ -79,7 +79,7 @@ Given a parsing model $M$ and a sentence $S$, derive the optimal dependency grap
 \end{enumerate}
 
 
-% copy over to references 
+% copy over to references
 % @article{kubler2009dependency,
 %   title={Dependency parsing},
 %   author={K{\"u}bler, Sandra and McDonald, Ryan and Nivre, Joakim},
@@ -92,8 +92,8 @@ Given a parsing model $M$ and a sentence $S$, derive the optimal dependency grap
 % }
 
 \subsection{Transition-Based Dependency Parsing}
-Transition-based dependency parsing relies on a state machine which defines the possible transitions to create the mapping from the input sentence to the dependency tree. 
-The \textit{learning problem} is to induce a model which can predict the next transition in the state machine based on the transition history. The \textit{parsing problem} is to construct the optimal sequence of transitions for the input sentence, given the previously induced model.  
+Transition-based dependency parsing relies on a state machine which defines the possible transitions to create the mapping from the input sentence to the dependency tree.
+The \textit{learning problem} is to induce a model which can predict the next transition in the state machine based on the transition history. The \textit{parsing problem} is to construct the optimal sequence of transitions for the input sentence, given the previously induced model.
 Most transition-based systems do not make use of a formal grammar.
 
 \subsection{Greedy Deterministic Transition-Based Parsing}
@@ -115,7 +115,7 @@ It follows that for any sentence $S=w_0w_1...w_n$,
 \end{enumerate}
 
 \textbf{Transitions:} \\
-% add image of transitions 
+% add image of transitions
 
 \begin{marginfigure}
 	\centering
@@ -149,7 +149,7 @@ Depending on the desired complexity of the model, there is flexibility in defini
 
 \begin{enumerate}
 \item $S_{word}$: Vector representations for some of the words in $S$ (and their dependents) at the top of the stack $\sigma$ and buffer $\beta$.
-\item $S_{tag}$: Part-of-Speech (POS) tags for some of the words in $S$. POS tags comprise a small, discrete set: $\mathcal{P}=\{NN,NNP,NNS,DT,JJ,...\}$ 
+\item $S_{tag}$: Part-of-Speech (POS) tags for some of the words in $S$. POS tags comprise a small, discrete set: $\mathcal{P}=\{NN,NNP,NNS,DT,JJ,...\}$
 \item $S_{label}$: The arc-labels for some of the words in $S$. The arc-labels comprise a small, discrete set, describing the dependency relation: $\mathcal{L}=\{amod,tmod,nsubj,csubj,dobj,...\}$
 \end{enumerate}
 For each feature type, we will have a corresponding embedding matrix, mapping from the feature's one hot encoding, to a $d$-dimensional dense vector representation. The full embedding matrix for $S_{word}$ is $E^w \in \mathbb{R}^{d \times N_w}$ where $N_w$ is the dictionary/vocabulary size. Correspondingly, the POS and label embedding matrices are $E^t \in \mathbb{R}^{d \times N_t}$ and $E^l \in \mathbb{R}^{d \times N_l}$ where $N_t$ and $N_l$ are the number of distinct POS tags and arc labels. \\
