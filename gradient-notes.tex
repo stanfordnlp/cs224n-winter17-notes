@@ -47,7 +47,7 @@
 
 
 \section{Introduction}
-The purpose of these notes is to demonstrate how to quickly compute neural network gradients. This will hopefully help you with question 3 of Assignment 2 (if you haven't already done it) and with the midterm (which will have at least one significant gradient computation question). It is \textbf{not} meant to provide an intuition for how backpropagation works -- for that I recommend going over lecture 5\footnote{http://web.stanford.edu/class/cs224n/lectures/cs224n-2017-lecture5.pdf} and the cs231 course notes\footnote{http://cs231n.github.io/optimization-2/} on backpropagation. 
+The purpose of these notes is to demonstrate how to quickly compute neural network gradients. This will hopefully help you with question 3 of Assignment 2 (if you haven't already done it) and with the midterm (which will have at least one significant gradient computation question). It is \textbf{not} meant to provide an intuition for how backpropagation works -- for that I recommend going over lecture 5\footnote{http://web.stanford.edu/class/cs224n/lectures/cs224n-2017-lecture5.pdf} and the cs231 course notes\footnote{http://cs231n.github.io/optimization-2/} on backpropagation.
 \section{Vectorized Gradients}
 While it is a good exercise to compute the gradient of a neural network with respect to a single parameter (e.g., a single element in a weight matrix), in practice this tends to be quite slow. Instead, it is more efficient to keep everything in matrix/vector form. The basic building block of vectorized gradients is the {\it Jacobian Matrix}. Suppose we have a function $\bmf: \mathbb{R}^n \to \mathbb{R}^m$ that maps a vector of length $n$ to a vector of length $m$: $\bmf(\bx) = [f_1(x_1, ..., x_n), f_2(x_1, ..., x_n), ..., f_m(x_1, ..., x_n)]$. Then its Jacobian is.
 
@@ -68,18 +68,18 @@ As a little illustration of this, suppose we have a function $\bmf(x) = [f_1(x),
 	\end{bmatrix} =  \begin{bmatrix}
 		\pd{g_1}{f_1}\pd{f_1}{x} + \pd{g_1}{f_2}\pd{f_2}{x}   \\
 		\pd{g_2}{f_1}\pd{f_1}{x} + \pd{g_2}{f_2}\pd{f_2}{x}  \\
-	\end{bmatrix} 
+	\end{bmatrix}
 }
 And we see this is the same as multiplying the two Jacobians:
 \alns{
 \pd{\bg}{x} = \pd{\bg}{\bmf}\pd{\bmf}{x} = \begin{bmatrix}
 	\pd{g_1}{f_1} & \pd{g_1}{f_2} \\
-	\pd{g_2}{f_1} & \pd{g_2}{f_2} \\	
-\end{bmatrix} 
+	\pd{g_2}{f_1} & \pd{g_2}{f_2} \\
+\end{bmatrix}
 \begin{bmatrix}
 	\pd{f_1}{x} \\
-	\pd{f_2}{x} \\	
-\end{bmatrix} 
+	\pd{f_2}{x} \\
+\end{bmatrix}
 }
 
 \section{Useful Identities}
@@ -121,7 +121,7 @@ We have $z_i = x_i$. So
 \alns{
 (\pd{\bz}{\bx})_{ij} = \pd{z_i}{x_j} = \pd{}{x_j}x_i = \begin{cases}
 	1 \phantom{abc} \text{if $i = j$} \\
-	0 \phantom{abc} \text{if otherwise} 
+	0 \phantom{abc} \text{if otherwise}
 	\end{cases}
 }
 So we see that the Jacobian $\pd{\bz}{\bx}$ is a diagonal matrix where the entry at $(i, i)$ is 1. This is just the identity matrix: $\boxed{\pd{\bz}{\bx} = \bI}$. When applying the chain rule, this term will disappear because a matrix multiplied by the identity matrix does not change.
@@ -131,7 +131,7 @@ If $f$ is being applied elementwise, we have $z_i = f(x_i)$. So
 \alns{
 	(\pd{\bz}{\bx})_{ij} = \pd{z_i}{x_j} = \pd{}{x_j}f(x_i) = \begin{cases}
 	f'(x_i) \phantom{abc} \text{if $i = j$} \\
-	0 \phantom{abc} \text{if otherwise} 
+	0 \phantom{abc} \text{if otherwise}
 	\end{cases}
 }
 So we see that the Jacobian $\pd{\bz}{\bx}$ is a diagonal matrix where the entry at $(i, i)$ is the derivative of $f$ applied to $x_i$. We can write this as $\boxed{\pd{\bz}{\bx} = \diag(f'(\bx))}$. Since multiplication by a diagonal matrix is the same as doing elementwise multiplication by the diagonal, we could also write $\boxed{\circ f'(\bx)}$ when applying the chain rule.
@@ -151,7 +151,7 @@ First suppose we have a loss function $J$ (a scalar) and are computing its gradi
 }
 Since this matrix has the same shape as $\bW$, we could just subtract it (times the learning rate) from $\bW$ when doing gradient descent. So (in a slight abuse of notation) let's find this matrix as $\pd{J}{\bW}$ instead.
 
-%This way of arranging the gradients becomes complicated when computing $\pd{\bz}{\bW}$. Unlike $J$, $\bz$ is vector-valued. So if we are trying to rearrange the gradients like with $\pd{J}{\bW}$, $\pd{\bz}{\bW}$ would become an $n \times m \times m$ tensor! 
+%This way of arranging the gradients becomes complicated when computing $\pd{\bz}{\bW}$. Unlike $J$, $\bz$ is vector-valued. So if we are trying to rearrange the gradients like with $\pd{J}{\bW}$, $\pd{\bz}{\bW}$ would become an $n \times m \times m$ tensor!
 
 I think the easiest way of computing this matrix is by finding the gradient for a single weight $W_{ij}$. We have
 \alns{
@@ -160,7 +160,7 @@ I think the easiest way of computing this matrix is by finding the gradient for 
 }
 Note that $\pd{}{W_{ij}}W_{kl} = 1$ if $i = k$ and $j = l$ and 0 if otherwise. So if $k \neq i$ everything in the sum is zero and the gradient is zero. Otherwise, the only nonzero element of the sum is when $l = j$, so we just get $x_j$. Thus we find $\pd{z_k}{W_{ij}} = x_j$ if $k = i$ and 0 if otherwise. Another way of writing this is
  \alns{
- 	\pd{\bz}{W_{ij}} = \begin{bmatrix} 0 \\ \vdots \\ 0 \\ x_j \\ 0 \\ \vdots \\ 0 \end{bmatrix} 
+ 	\pd{\bz}{W_{ij}} = \begin{bmatrix} 0 \\ \vdots \\ 0 \\ x_j \\ 0 \\ \vdots \\ 0 \end{bmatrix}
 	\gets \text{$i$th element}
 }
 Now let's compute $\pd{J}{W_{ij}}$
@@ -191,7 +191,7 @@ You did this in Assignment 1! The gradient is $\boxed{\pd{J}{\btheta} = \yhat - 
 
 \end{enumerate}
 
-These identities will be enough to let you quickly compute the gradients for many neural networks. However, it's important to know how to compute Jacobians for other functions as well in case they show up. Some examples if you want practice: dot product of two vectors, elementwise product of two vectors, 2-norm of a vector. Feel free to use these identities on the midterm and assignments. 
+These identities will be enough to let you quickly compute the gradients for many neural networks. However, it's important to know how to compute Jacobians for other functions as well in case they show up. Some examples if you want practice: dot product of two vectors, elementwise product of two vectors, 2-norm of a vector. Feel free to use these identities on the midterm and assignments.
 
 \section{Example: 1-Layer Neural Network with Embeddings}
 This section provides an example of computing the gradients of a full neural network.
@@ -204,7 +204,7 @@ In particular we are going to compute the gradients of the dependency parser you
 	\yhat &= \smx(\btheta) \\
 	J &= CE(\by, \yhat)
 }
-It helps to break up the model into the simplest parts possible, so note that we defined $\bz$ and $\btheta$ to split up the activation functions from the linear transformations in the network's layers. The dimensions of the model's parameters are 
+It helps to break up the model into the simplest parts possible, so note that we defined $\bz$ and $\btheta$ to split up the activation functions from the linear transformations in the network's layers. The dimensions of the model's parameters are
 \[
 \bL \in \mathbb{R}^{|V| \times d} \quad\quad
 \bb_1 \in \mathbb{R}^{1 \times D_h} \quad\quad
@@ -224,11 +224,11 @@ In this example, we will compute all the gradients:
 \frac{\partial J}{\partial \bL_{w_i}} \quad\quad
 \]
 
-To start with, recall that $\relu(x) = \max(x, 0)$. This means 
+To start with, recall that $\relu(x) = \max(x, 0)$. This means
 \begin{align*}
 \relu'(x) = \begin{cases}
 	1 \phantom{abc} \text{if $x > 0$} \\
-	0 \phantom{abc} \text{if otherwise} 
+	0 \phantom{abc} \text{if otherwise}
 	\end{cases}
 	= \sgn(\relu(x))
 \end{align*}
@@ -241,7 +241,7 @@ Now let's write out the chain rule for $\pd{J}{\bU}$ and $\pd{J}{\bb_2}$:
 }
 Notice that $\pd{J}{\yhat}\pd{\yhat}{\btheta} = \pd{J}{\btheta}$ is present in both gradients. This makes the math a bit cumbersome. Even worse, if we're implementing the model without automatic differentiation, computing $\pd{J}{\btheta}$ twice will be inefficient. So it will help us to define some variables to represent the intermediate derivatives:
 \alns{
-	\bdelta_1 = \pd{J}{\btheta} \quad\quad 
+	\bdelta_1 = \pd{J}{\btheta} \quad\quad
 	\bdelta_2 = \pd{J}{\bz}
 }
 We can compute them as follows:
@@ -261,20 +261,20 @@ A good way of checking our work is by looking at the dimensions of the terms in 
 We see that the dimensions of all the terms in the gradient match up (i.e., the number of columns in a term equals the number of rows in the next term).
 This will always be the case if we computed our gradients correctly. \\
 
-%\todo{something about checking dimensions} 
+%\todo{something about checking dimensions}
  Now we can use the error terms to compute our gradients:
 \alns{
 	\pd{J}{\bU} &= \pd{J}{\btheta}\pd{\btheta}{\bU} = \bdelta_1\pd{\btheta}{\bU} = \bh^T \bdelta_1 & \text{using identity (6)} \\
 	\pd{J}{\bb_2} &= \pd{J}{\btheta}\pd{\btheta}{\bb_2} = \bdelta_1\pd{\btheta}{\bb_2} =\bdelta_1 & \text{using identity (3)} \\
 	\pd{J}{\bW} &= \pd{J}{\btheta}\pd{\bz}{\bW} = \bdelta_2\pd{\bz}{\bW} = \bx^T \bdelta_2 & \text{using identity (6)} \\
 	\pd{J}{\bb_1} &= \pd{J}{\btheta}\pd{\bz}{\bb_1} = \bdelta_2\pd{\bz}{\bb_1} = \bdelta_2 & \text{using identity (3)} \\
-	\pd{J}{\bL_{w_i}} &= \pd{J}{\bz}\pd{\bz}{\bL_{w_i}} = \bdelta_2 \pd{\bz}{\bL_{w_i}} 
+	\pd{J}{\bL_{w_i}} &= \pd{J}{\bz}\pd{\bz}{\bL_{w_i}} = \bdelta_2 \pd{\bz}{\bL_{w_i}}
 	%\pd{J}{\bL_{w_i}} &= \pd{J}{\btheta}\pd{\bz}{\bx}\pd{\bx}{\bL_{w_i}} = \bdelta_2 \bW^T\pd{\bx}{\bL_{w_i}} & \text{Using identity (2)}
 }
 All that's left is to compute $\pd{\bz}{\bL_{w_i}}$. It helps to split up $\bW$ by rows like this:
 \alns{
-	\bx \bW &= [\bL_{w_0}, \bL_{w_1}, ..., \bL_{w_{m - 1} }] \bW 
-	= [\bL_{w_0}, \bL_{w_1}, ..., \bL_{w_{m - 1} }]  
+	\bx \bW &= [\bL_{w_0}, \bL_{w_1}, ..., \bL_{w_{m - 1} }] \bW
+	= [\bL_{w_0}, \bL_{w_1}, ..., \bL_{w_{m - 1} }]
 	\begin{bmatrix} \bW_{0:d} \\ \bW_{d:2d} \\ \vdots \\ \bW_{(m - 1)d:md} \end{bmatrix} \\
 	&= \bL_{w_0} \bW_{0:d}  + \bL_{w_1} \bW_{d:2d} + \dots + \bL_{w_{m - 1}}\bW_{(m - 1)d:md}
 	=\sum_{j = 0}^{m - 1} \bL_{w_j} \bW_{dj:d(j + 1)}
