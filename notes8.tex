@@ -1,0 +1,68 @@
+\documentclass{tufte-handout}
+
+
+\title{CS224n: Deep Learning for NLP\thanks{Course Instructor: Richard Socher} \\
+       \Large Lecture Notes: Part VIII \thanks{Authors:}}
+
+\date{Winter 2017} % without \date command, current date is supplied
+
+%\geometry{showframe} % display margins for debugging page layout
+
+\usepackage{graphicx} % allow embedded images
+\setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
+\graphicspath{{notes8/fig/}} % set of paths to search for images
+\usepackage{amsmath}  % extended mathematics
+\usepackage{amstext}  % extended text
+\usepackage{booktabs} % book-quality tables
+\usepackage{units}    % non-stacked fractions and better unit spacing
+\usepackage{multicol} % multiple column layout facilities
+\usepackage{lipsum}   % filler text
+\usepackage{fancyvrb} % extended verbatim environments
+\usepackage{placeins}
+\usepackage{mdframed}% http://ctan.org/pkg/mdframed
+\fvset{fontsize=\normalsize}% default font size for fancy-verbatim environments
+
+% Standardize command font styles and environments
+\newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
+\newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
+\newcommand{\docarg}[1]{\textrm{\textit{#1}}}% (required) command argument
+\newcommand{\docenv}[1]{\textsf{#1}}% environment name
+\newcommand{\docpkg}[1]{\texttt{#1}}% package name
+\newcommand{\doccls}[1]{\texttt{#1}}% document class name
+\newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
+\newenvironment{docspec}{\begin{quote}\noindent}{\end{quote}}% command specification environment
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\textunderscript}[1]{$_{\text{#1}}$}
+\allowdisplaybreaks
+\setcounter{secnumdepth}{3}
+
+\newmdtheoremenv[outerlinewidth=2,leftmargin=40,rightmargin=40,%
+    backgroundcolor=lightgray,outerlinecolor=blue,innertopmargin=10pt,%
+    splittopskip=\topskip,skipbelow=\baselineskip,%
+    skipabove=\baselineskip,ntheorem,roundcorner=5pt]{theorem}{Snippet}[section]
+
+\begin{document}
+
+\maketitle% this prints the handout title, author, and date
+
+%\printclassoptions
+
+
+\textbf{Keyphrases: Coreference Resolution, Dynamic Memory Networks for Question Answering over Text and Images}
+
+\section{Coreference Resolution}
+% from http://web.stanford.edu/class/cs224n/lectures/cs224n-2017-lecture15.pdf
+% put your figures in notes8/fig/
+
+
+\section{Dynamic Memory Networks for Question Answering over Text and Images}
+% from http://cs224d.stanford.edu/lectures/CS224d-Lecture17.pdf
+% put your figures in notes8/fig/
+
+
+\section{Speech Processing}
+In this class, we have only looked at natural language in the form of text thus far. Speech is another medium of natural language. In the following section, $<paste here>$
+
+\end{document}

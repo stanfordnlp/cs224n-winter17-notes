@@ -157,9 +157,6 @@ We now augment our word representation, to not only include a word vector, but a
 
 By observing the errors the model makes, we see even the MV-RNN still can not express certain relations. We observe three major classes of mistakes.
 
-First, Negated Positives. When we say something positive but one word turns it negative, the model can not weigh that one word strong enough to flip the sentiment of the entire sentence. Figure 7 shows such an example where the swap of the word ''most'' to ''least'' should flip the entire sentiment of the sentence, but the MV-RNN does not capture this successfully.
-
-
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{img7}
@@ -167,7 +164,8 @@ First, Negated Positives. When we say something positive but one word turns it n
   \label{fig:img7}
 \end{marginfigure}
 
-The second class of mistakes is the Negated Negative case. Where we say something is not bad, or not dull, as in Figure 8. The MV-RNN can not recognize that the word ''not'' lessens the sentiment from negative to neutral.
+
+First, Negated Positives. When we say something positive but one word turns it negative, the model can not weigh that one word strong enough to flip the sentiment of the entire sentence. Figure 7 shows such an example where the swap of the word ''most'' to ''least'' should flip the entire sentiment of the sentence, but the MV-RNN does not capture this successfully.
 
 
 \begin{marginfigure}%
@@ -175,6 +173,11 @@ The second class of mistakes is the Negated Negative case. Where we say somethin
   \caption{Negated Negatives}
   \label{fig:img8}
 \end{marginfigure}
+
+
+
+The second class of mistakes is the Negated Negative case. Where we say something is not bad, or not dull, as in Figure 8. The MV-RNN can not recognize that the word ''not'' lessens the sentiment from negative to neutral.
+
 
 The final class of errors we observe is the ''X but Y conjunction'' displayed in Figure 9. Here the X might be negative BUT if the Y is positive then the model's sentiment output for the sentence should be positive! MV-RNNs struggle with this.
 
@@ -189,18 +192,22 @@ Thus, we must look for an even more expressive composition algorithm that will b
 \subsection{RNTNs (Recursive Neural Tensor Network)}
 
 The final RNN we will cover here is by far the most successful on the three types of errors we left off with. The Recursive Neural Tensor Network does away with the notion of a word matrix, and furthermore, does away with the traditional affine transformation pre-tanh/sigmoid concept. To compose two word vectors or phrase vectors, we again concatenate them to form a vector $\in \mathbb{R}^{2d}$ but instead of putting it through an affine function then a nonlinear, we put it through a quadratic first, then a nonlinear, such as:
-\begin{equation}
-h^{(1)} = tanh(x^T V x + Wx)
-\end{equation}
-
-Note that $V$ is a 3rd order tensor in $\in \mathbb{R}^{2d \times 2d \times d}$.  We compute $ x^T V[i] x $  $\forall i \in [1, 2, ... d]$ slices of the tensor outputting a vector $\in \mathbb{R}^{d}$. We then add $Wx$ and put it through a nonlinear function. The quadratic shows that we can indeed allow for the multiplicative type of interaction between the word vectors without needing to maintain and learn word matrices!
-
 
 \begin{marginfigure}%
   \includegraphics[width=\linewidth]{img10}
   \caption{One slice of a RNTN. Note there would be d of these slices.}
   \label{fig:img10}
 \end{marginfigure}
+
+\begin{equation}
+h^{(1)} = tanh(x^T V x + Wx)
+\end{equation}
+
+
+Note that $V$ is a 3rd order tensor in $\in \mathbb{R}^{2d \times 2d \times d}$.  We compute $ x^T V[i] x $  $\forall i \in [1, 2, ... d]$ slices of the tensor outputting a vector $\in \mathbb{R}^{d}$. We then add $Wx$ and put it through a nonlinear function. The quadratic shows that we can indeed allow for the multiplicative type of interaction between the word vectors without needing to maintain and learn word matrices!
+
+
+
 
 
 \begin{marginfigure}%
@@ -221,7 +228,7 @@ Back to sentence representation, what if you did NOT know the parse tree? The Re
 Convolutional Neural Networks take in a sentence of word vectors and first create a phrase vector for all subphrases, not just grammatically correct phrases (as with Recursive Neural Network)! And then, CNNs group them together for the task at hand.
 
 \subsection{What is Convolution?}
-Let's start with the 1D case. Consider two 1D vectors, $f$ and $g$ with $f$ being our primary vector and $g$ corresponding to the filter. The convolution between $f$ and $g$, evaluated at entry $n$ is represented as $(f*g)[n]$ and is equal to $\sum\limits_{m=-M}^Mf[n-m]g[m]$. \\
+Let's start with the 1D case. Consider two 1D vectors, $f$ and $g$ with $f$ being our primary vector and $g$ corresponding to the \textbf{filter}. The convolution between $f$ and $g$, evaluated at entry $n$ is represented as $(f*g)[n]$ and is equal to $\sum\limits_{m=-M}^Mf[n-m]g[m]$. \\
 Figure \ref{fig:2d_conv} shows the 2D convolution case. The $9\times 9$ green matrix represents the primary matrix of concern, $f$. The $3\times 3$ matrix of red numbers represents the filter $g$ and the convolution currently being evaluated is at position $[2,2]$. Figure \ref{fig:2d_conv} shows the value of the convolution at position $[2,2]$ as 4 in the second table. Can you complete the second table?
 
 \begin{marginfigure}%
@@ -277,6 +284,9 @@ This is a generalization of the max pooling layer. Instead of picking out only t
 
 
 \section{Constituency Parsing}
+
+Natural Language Understanding requires being able to extract meaning from large text units from the understanding of smaller parts. This extraction requires being able to understand how smaller parts are put together. There are two main techniques to analyze the syntactic structure of sentences: \textbf{constituency parsing} and \textbf{dependency parsing}. Dependency parsing was covered in the previous lectures (see \textit{lecture notes 4}). By building binary asymmetric relations between a word and its dependents, the structure shows which word depends on which other words. Now we focus on constituency parsing, that organizes words into nested constituents. 
+
 Constituency Parsing is a way to break a piece of text (e.g. one sentence) into sub-phrases. One of the goals of constituency parsing (also known as "phrase structure parsing") is to identify the constituents in the text which would be useful when extracting information from text. By knowing the constituents after parsing the sentence, it is possible to generate similar sentences syntactically correct.
 
 
@@ -284,6 +294,9 @@ Constituency Parsing is a way to break a piece of text (e.g. one sentence) into 
 In syntactic analysis, a constituent can be a single word or a phrases as a single unit within a hierarchical structure. A phrase is a sequence of two or more words built around a head lexical item and working as a unit within a sentence. To be a phrase, a group of words should come together to play a specific role in the sentence. In addition, the group of words can be moved together or replaced as a whole, and the sentence should remain fluent and grammatical.
 
 For instance, the following sentence contains the noun phrase: "wonderful CS224N".
+\marginnote{We interpret large text units by \textbf{semantic composition} of smaller elements. These smaller elements can be changed while keeping a similar meaning, like in the following examples.
+}
+
 \begin{itemize}
 \item I want to be enrolled in the wonderful CS224N!
 \end{itemize}
@@ -292,6 +305,7 @@ We can rewrite the sentence by moving that whole phrase to the front as below.
 \begin{itemize}
 \item The wonderful CS224N I want to be enrolled in!
 \end{itemize}
+
 
 Or the phrase could be replaced with an constituent of similar function and meaning, like "great CS course in Stanford about NLP and Deep Learning".
 
@@ -305,11 +319,8 @@ For constituency parsing, the basic clause structure is understood as a binary d
 \item S ->\quad NP \quad VP
 \end{itemize}
 
-In fact, the process of parsing illustrates certain similar rules. We deduce the rules by beginning with the sentence symbol S, and applying the phrase structure rules successively, finally applying replacement rules to substitute actual words for the abstract symbols. Based on the extracted rules, it is possible to generate similar sentences. If the rules are correct, then any sentence produced in this way should be syntactically correct. However, the generated sentences might be syntactically correct but semantically nonsensical, such as the following well-known example:
 
-\begin{itemize}
-\item Colorless green ideas sleep furiously
-\end{itemize}
+In fact, the process of parsing illustrates certain similar rules. We deduce the rules by beginning with the sentence symbol S, and applying the phrase structure rules successively, finally applying replacement rules to substitute actual words for the abstract symbols. Based on the extracted rules, it is possible to generate similar sentences. If the rules are correct, then any sentence produced in this way should be syntactically correct. However, the generated sentences might be syntactically correct but semantically nonsensical, such as the following well-known example:
 
 \begin{marginfigure}
 	\centering
@@ -317,6 +328,11 @@ In fact, the process of parsing illustrates certain similar rules. We deduce the
 	\caption {Constituency Parse Tree for 'Colorless green ideas sleep furiously'}
 	\label{fig:nonsense}
 \end{marginfigure}
+
+
+\begin{itemize}
+\item Colorless green ideas sleep furiously
+\end{itemize}
 
 
 \subsection{Constituency Parse Tree}
@@ -341,17 +357,17 @@ We have a parse tree starting from root S, which represents the whole sentence, 
 \end{itemize}
 
 
-\subsection{Dependency-based Parsing}
-Besides constituency parsing, there is another competing understanding of the logic of sentences, called 'dependency-based parsing'. The binary division of the sentence is rejected and replaced with the logic in terms of predicates and their arguments. It is a one-to-one correspondence compared to the one-to-one-or-more correspondence in constituency parsing. For every element in a sentence, there is just one node in the syntactic structure.
+%\subsection{Dependency-based Parsing}
+%Besides constituency parsing, there is another competing understanding of the logic of sentences, called 'dependency-based parsing'. The binary division of the sentence is rejected and replaced with the logic in terms of predicates and their arguments. It is a one-to-one correspondence compared to the one-to-one-or-more correspondence in constituency parsing. For every element in a sentence, there is just one node in the syntactic structure.
 
-We parse the sentence 'John hits the ball' in terms of dependency-based parse tree. There is no distinction between terminal and non-terminal categories and it lacks the phrasal categories (S, VP, and NP) seen in the constituency-based counterpart above. It is simpler than the Constituent parse tree comparatively.
+%We parse the sentence 'John hits the ball' in terms of dependency-based parse tree. There is no distinction between terminal and non-terminal categories and it lacks the phrasal categories (S, VP, and NP) seen in the constituency-based counterpart above. It is simpler than the Constituent parse tree comparatively.
 
-\begin{marginfigure}
-	\centering
-	\includegraphics[width=0.9\linewidth]{denpendency.png}
-	\caption {Dependency-based Parse Tree for 'John hits the ball'}
-	\label{fig:dependency}
-\end{marginfigure}
+%\begin{marginfigure}
+%	\centering
+%	\includegraphics[width=0.9\linewidth]{denpendency.png}
+%	\caption {Dependency-based Parse Tree for 'John hits the ball'}
+%	\label{fig:dependency}
+%\end{marginfigure}
 
 % \begin{marginfigure}%
 %   \includegraphics[width=\linewidth]{img12}
