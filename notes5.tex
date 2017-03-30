@@ -198,7 +198,7 @@ The error for each time-step is computed through applying the chain rule differe
 
 Equation~\ref{eqn:bp_rnn_k} shows the relationship to compute each $dh_t/dh_k$; this is simply a chain rule differentiation over all hidden layers within the $[k, t]$ time interval.
 \begin{equation}
-	\dfrac{\partial h_t}{\partial h_k} = \prod_{j=k+1}^{t}\dfrac{\partial h_j}{\partial h_{j-1}} = \prod_{j=k+1}^{t}W^T \times diag [f'(j_{j-1})]
+	\dfrac{\partial h_t}{\partial h_k} = \prod_{j=k+1}^{t}\dfrac{\partial h_j}{\partial h_{j-1}} = \prod_{j=k+1}^{t}W  \sigma'(h_{j-1})
 	\label{eqn:bp_rnn_k}
 \end{equation}
 
@@ -223,7 +223,7 @@ Putting Equations~\ref{eqn:bp_rnn_error}, \ref{eqn:bp_rnn_chain}, \ref{eqn:bp_rn
 Equation~\ref{eqn:bp_rnn_k_norm} shows the norm of the Jacobian matrix relationship in Equation~\ref{eqn:bp_rnn_jaocb}. Here, $\beta_W$ and $\beta_h$ represent the upper bound values for the two matrix norms. The norm of the partial gradient at each time-step, $t$, is therefore, calculated through the relationship shown in Equation~\ref{eqn:bp_rnn_k_norm}.
 
 \begin {equation}
-	\parallel \dfrac{\partial h_j}{\partial h_{j-1}} \parallel \leq \parallel W^T\parallel  \parallel diag [f'(h_{j-1})]\parallel \leq \beta_W \beta_h
+	\parallel \dfrac{\partial h_j}{\partial h_{j-1}} \parallel \leq \parallel W\parallel  \parallel diag [f'(h_{j-1})]\parallel \leq \beta_W \beta_h
 	\label{eqn:bp_rnn_k_norm}
 \end {equation}
 
